@@ -26,3 +26,4 @@ venv/
 data/activations/
 data/trajectories/
 data/normalized*/
+.pytest_cache/

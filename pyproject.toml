@@ -16,6 +16,7 @@ dependencies = [
     "pyyaml>=6.0",
     "python-dotenv>=1.0.0",
     "openai>=1.40.0",
+    "datasets>=2.14.0",
 ]
 
 [project.optional-dependencies]
@@ -31,3 +32,7 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["prognosis*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

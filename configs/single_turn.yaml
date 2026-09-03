@@ -1,0 +1,25 @@
+# Single-turn coding control: the frozen value axis against DebugBench code
+# correctness. Same model and thinking mode as the axis construction.
+model: Qwen/Qwen3-32B
+n_layers: 64
+hidden_dim: 5120
+enable_thinking: true
+dtype: bfloat16
+
+# Frozen axis, never refit here. Produced by the axis reconstruction; see
+# docs/REPRODUCE.md.
+axis_path: data/value_axis.npy
+axis_manifest_path: data/axis_manifest.json
+# Used when the manifest does not record a primary layer.
+primary_layer: 36
+
+# Rtian/DebugBench on Hugging Face, filtered to language == "python3" (the
+# dataset's own lowercase code, verified against the loaded dataset).
+dataset_name: Rtian/DebugBench
+language: python3
+n_problems: 150
+seed: 42
+variants: [buggy, syntax_error, shuffled, obfuscated]
+
+n_boot: 1000
+n_perm: 2000

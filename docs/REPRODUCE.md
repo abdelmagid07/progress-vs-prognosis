@@ -1,22 +1,65 @@
 # Reproduction order
 
-Stages 1 and 3 need a GPU. Everything else runs on CPU from the derived files in
-`results/` and the projection tables produced by stage 3.
+Stages 1 and 3 need a GPU. Everything else runs on CPU from the projection tables
+those stages produce.
 
 | # | Stage | GPU | Entry point |
 |---|---|---|---|
 | 1 | Reconstruct the value axis and verify it single-turn | yes | `notebooks/` |
-| 2 | Select tasks and generate agent trajectories | no (served model) | `scripts/` |
+| 1b | Single-turn coding control on DebugBench | yes | `prognosis.single_turn` |
+| 2 | Select tasks and generate agent trajectories | no (served model) | `prognosis.agent` |
 | 3 | Extract activations and project onto the axis | yes | `notebooks/` |
-| 4 | Across-task and within-task readouts | no | `scripts/` |
-| 5 | Probes, confound cascade, leakage controls | no | `scripts/` |
-| 6 | Error-response and elicited-confidence analyses | no | `scripts/` |
+| 4 | Across-task and within-task readouts | no | `prognosis.analysis` |
+| 5 | Probes, confound cascade, leakage controls | no | `prognosis.analysis` |
+| 6 | Error-response and elicited-confidence analyses | no | `prognosis.analysis` |
 
 ## Paper section to script
 
-Filled in as each stage is ported. Each row names the script that writes the file in
-`results/` from which the reported number is read.
+Filled in as each stage is ported. Each row names the module that computes the
+reported number and the file it writes under `data/`.
 
 | Paper section | Result | Script | Output |
 |---|---|---|---|
-| | | | |
+| Axis reconstruction | Held-out token-level AUROC by layer; peak layer 42, AUROC 0.836 | `python -m prognosis.axis.token_level_auroc` | `data/token_level_heldout_auroc_by_layer.csv` |
+| Single-turn control | Frozen axis vs. code correctness, pooled AUROC 0.641 | `python -m prognosis.single_turn.analyze` | `data/single_turn/report/report.json` |
+
+
+## Stage 1 detail: reconstructing the axis
+
+The axis is built by the prior work's own construction code, run unmodified except
+for a memory and checkpointing patch. That code is not vendored here; clone it at the
+pinned commit recorded in `DATA.md` and follow its `construction/` README. The
+inputs are the public ICRL dataset and Qwen3-32B; the output is a `(65, 5120)` array,
+one row per hidden state including the embedding row.
+
+Verifying the reconstruction needs the token-level held-out AUROC, which the released
+construction code cannot produce -- see `DATA.md`. That statistic is computed in two
+steps:
+
+1. **Extract per-token projections** (GPU). For every classified token, record its dot
+   product against each reward function's before-mean and after-mean at every layer.
+   The token classification logic is the prior work's, unchanged. The result is a
+   `(n_tokens, n_layers, 2 * n_functions)` table; at the sizes reported in the paper
+   this is roughly 1.1 GB, so it is not distributed here.
+2. **Score repeated held-out splits** (CPU). `prognosis.axis.token_level_auroc`
+   consumes that table. Because the axis for a given split is a linear combination of
+   per-function means, every split is evaluated from the precomputed table without
+   further GPU passes.
+
+
+## Stage 1b: single-turn coding control
+
+Checks that the frozen axis still behaves as expected on single-turn code before
+any agentic transfer is attempted. Each DebugBench problem contributes its correct
+solution and four corrupted variants; the axis should score the correct one higher.
+
+```bash
+python -m prognosis.single_turn.prepare      # CPU: problems and rendered prompts
+python -m prognosis.single_turn.run_control  # GPU: one forward pass per variant
+python -m prognosis.single_turn.analyze      # CPU: AUROC, BCa CI, permutation
+```
+
+Three readouts are computed in the same pass. The window readout is the one
+comparable to the original paper: it averages only over tokens after the point
+where the correct and corrupted code diverge. The whole-span mean is diluted by a
+positional ramp unrelated to correctness, and is reported for completeness only.

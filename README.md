@@ -25,14 +25,15 @@ Concretely, the pipeline here:
 
 | Path | Contents |
 |---|---|
-| `src/prognosis/axis/` | Value axis reconstruction and single-turn verification |
+| `src/prognosis/axis/` | Value axis reconstruction and verification |
+| `src/prognosis/single_turn/` | Single-turn coding control on DebugBench |
 | `src/prognosis/agent/` | Agent rollouts, trajectory normalization, elicited confidence |
 | `src/prognosis/extract/` | Activation capture and projection onto directions |
 | `src/prognosis/analysis/` | Probes, statistics, confound and leakage controls |
-| `scripts/` | One entry point per reported result |
+| `src/prognosis/common/` | Paths and chat-template helpers |
+| `tests/` | Offline wiring tests; no GPU or network |
 | `notebooks/` | GPU stages (activation extraction, projection, steering) |
 | `configs/` | Model, agent, and task-selection configuration |
-| `results/` | The JSON and CSV files the reported numbers are read from |
 | `docs/` | Reproduction order and data provenance |
 
 `docs/REPRODUCE.md` gives the end-to-end order and which stages need a GPU.
@@ -53,10 +54,9 @@ whenever a layer number is compared across the two.
 
 ## Reproducing the reported numbers
 
-Every number in the paper is read from a file in `results/`. The scripts that write
-those files are listed in `docs/REPRODUCE.md`, mapped to the section that reports
-them. Activation extraction and rollout generation need a GPU and are the only
-expensive stages; all downstream analysis runs on CPU from the shipped derived files.
+`docs/REPRODUCE.md` maps each reported result to the module that computes it and
+the file that module writes. Activation extraction and rollout generation need a GPU
+and are the only expensive stages; everything downstream runs on CPU.
 
 ## Relation to prior work
 
@@ -73,7 +73,3 @@ details differ from a naive reconstruction and are documented in `docs/DATA.md`.
 
 Agent rollouts use `mini-swe-agent` on SWE-bench Verified; both are third-party and
 pinned in `pyproject.toml`.
-
-## License
-
-MIT, see `LICENSE`.

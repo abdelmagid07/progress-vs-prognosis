@@ -4,12 +4,17 @@ This file tracks the staged port from the working repository. It must not be pre
 in the released repository. Nothing else in this repository refers to it.
 
 - [x] **Stage 1 - scaffold.** Layout, README, license, gitignore, pyproject, docs stubs.
-- [ ] **Stage 2 - axis reconstruction.** `src/prognosis/axis/`, single-turn verification.
+- [x] **Stage 2 - axis reconstruction.** Token-level held-out AUROC, verified to
+      reproduce the shipped curve exactly. The extraction step that writes the
+      projection table has no surviving source and still needs rewriting.
+- [x] **Stage 2b - single-turn control.** `src/prognosis/single_turn/`, plus the
+      shared `analysis/stats.py`, `extract/hooks.py`, `common/chat.py` it needs.
+      30 tests pass.
 - [ ] **Stage 3 - agent rollouts.** `src/prognosis/agent/`, task selection, normalization,
       elicited confidence.
 - [ ] **Stage 4 - extraction and projection.** `src/prognosis/extract/`.
-- [ ] **Stage 5 - analysis scripts.** `src/prognosis/analysis/`, `scripts/`.
-- [ ] **Stage 6 - results.** `results/` JSON and CSV the paper reads from.
+- [ ] **Stage 5 - analysis.** `src/prognosis/analysis/` beyond stats.py.
+- [ ] **Stage 6 - dropped.** Derived results are not shipped; the code regenerates them.
 - [ ] **Stage 7 - notebooks.** Highest leak surface; port last, after a full scrub.
 - [ ] **Final - anonymity sweep.** See the checklist below, then delete this file.
 

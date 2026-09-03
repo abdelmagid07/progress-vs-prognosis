@@ -1,0 +1,28 @@
+# Secrets. Never commit; there is no key in this repository and there must not be.
+.env
+*.key
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Large artifacts. Activations and raw trajectories are not distributed with this
+# repository; see docs/DATA.md for what ships and what must be regenerated.
+*.npz
+*.npy
+*.parquet
+*.zip
+data/activations/
+data/trajectories/
+data/normalized*/

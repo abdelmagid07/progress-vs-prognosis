@@ -1,0 +1,33 @@
+[project]
+name = "progress-vs-prognosis"
+version = "1.0.0"
+description = "Local execution state and eventual outcome in long-horizon language agents"
+requires-python = ">=3.11"
+dependencies = [
+    "torch>=2.0.0",
+    "transformers>=4.51.0",
+    "accelerate>=0.25.0",
+    "numpy>=1.24.0",
+    "scipy>=1.11.0",
+    "scikit-learn>=1.3.0",
+    "pandas>=2.0.0",
+    "pyarrow>=14.0.0",
+    "matplotlib>=3.7.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+    "openai>=1.40.0",
+]
+
+[project.optional-dependencies]
+# Agent rollouts on real SWE-bench Verified. mini-swe-agent drives the model;
+# the swebench harness turns its predictions into resolved/unresolved labels.
+agent = ["mini-swe-agent==2.4.5", "swebench>=2.0.0"]
+dev = ["pytest>=7.0.0"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["prognosis*"]

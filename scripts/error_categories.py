@@ -39,11 +39,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2" / "scripts"))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from error_rule import is_error  # noqa: E402
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 
 # First match wins; most specific first.
 CATEGORIES = [
@@ -67,8 +67,8 @@ def categorise(observation: str | None) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--trajectories", type=Path,
-                    default=ROOT / "stage2" / "data" / "normalized_full" / "normalized_full")
-    ap.add_argument("--projections", type=Path, default=ROOT / "projections_full_new_axis.parquet")
+                    default=ROOT / "data" / "normalized")
+    ap.add_argument("--projections", type=Path, default=ROOT / "data" / "projections_full.parquet")
     ap.add_argument("--layer", type=int, default=53)
     args = ap.parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)

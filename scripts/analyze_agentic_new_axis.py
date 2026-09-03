@@ -47,10 +47,10 @@ import pandas as pd
 from scipy.stats import norm, rankdata
 from sklearn.metrics import average_precision_score
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2"))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 CHANCE = 0.5
 
 
@@ -188,7 +188,7 @@ def auroc_by_step(df: pd.DataFrame, peak_layer: int, *, n_boot: int = 1000) -> p
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--projections", type=Path, default=ROOT / "projections_full_new_axis.parquet")
+    ap.add_argument("--projections", type=Path, default=ROOT / "data" / "projections_full.parquet")
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--n-perm", type=int, default=2000)
     ap.add_argument("--n-bins", type=int, default=5)

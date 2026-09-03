@@ -5,7 +5,7 @@ those stages produce.
 
 | # | Stage | GPU | Entry point |
 |---|---|---|---|
-| 1 | Reconstruct the value axis and verify it single-turn | yes | `notebooks/` |
+| 1 | Reconstruct the value axis | yes | upstream + `patches/` |
 | 1b | Single-turn coding control on DebugBench | yes | `prognosis.single_turn` |
 | 2 | Generate agent trajectories, ingest, elicit confidence | no (served model) | `prognosis.agent` |
 | 3 | Extract activations and project onto the axis | yes | `prognosis.extract` |
@@ -26,11 +26,27 @@ reported number and the file it writes under `data/`.
 
 ## Stage 1 detail: reconstructing the axis
 
-The axis is built by the prior work's own construction code, run unmodified except
-for a memory and checkpointing patch. That code is not vendored here; clone it at the
-pinned commit recorded in `DATA.md` and follow its `construction/` README. The
-inputs are the public ICRL dataset and Qwen3-32B; the output is a `(65, 5120)` array,
-one row per hidden state including the embedding row.
+The axis is built by the prior work's own construction code. That code is not
+vendored here; clone it at the pinned commit recorded in `DATA.md`, apply the patch
+below, and follow its `construction/` README. The inputs are the public ICRL dataset
+and Qwen3-32B; the output is a `(65, 5120)` array, one row per hidden state including
+the embedding row.
+
+```bash
+git clone https://github.com/nickjiang2378/value-axis
+git -C value-axis checkout 44ad182f1e43902858748d8d4b93835c58ddfe4c
+patch -p1 -d value-axis < patches/extract_activations_memory_checkpoint.patch
+cd value-axis/construction
+python extract_activations.py --model Qwen/Qwen3-32B
+python compute_vector.py
+```
+
+The patch exists because the released script holds every classified token's per-layer
+activation in a growing list for the whole run and reduces to a mean only at the end,
+which exhausts memory partway through a 32B run. It accumulates a running sum and
+count instead, which is the same mean in bounded space, and checkpoints periodically
+so an interrupted run resumes. The token-classification functions are untouched;
+see `DATA.md`.
 
 Verifying the reconstruction needs the token-level held-out AUROC, which the released
 construction code cannot produce -- see `DATA.md`. That statistic is computed in two
@@ -38,13 +54,22 @@ steps:
 
 1. **Extract per-token projections** (GPU). For every classified token, record its dot
    product against each reward function's before-mean and after-mean at every layer.
-   The token classification logic is the prior work's, unchanged. The result is a
-   `(n_tokens, n_layers, 2 * n_functions)` table; at the sizes reported in the paper
-   this is roughly 1.1 GB, so it is not distributed here.
-2. **Score repeated held-out splits** (CPU). `prognosis.axis.token_level_auroc`
-   consumes that table. Because the axis for a given split is a linear combination of
-   per-function means, every split is evaluated from the precomputed table without
-   further GPU passes.
+   The token classification is the upstream function, imported from the clone rather
+   than reimplemented. The result is a `(n_tokens, n_layers, 2 * n_functions)` table;
+   at the sizes reported in the paper this is roughly 1.1 GB, so it is not
+   distributed here. The run checkpoints every 25 conversations and resumes.
+
+   ```bash
+   python -m prognosis.axis.token_projection_extraction --value-axis-repo value-axis
+   ```
+
+2. **Score repeated held-out splits** (CPU). Because the axis for a given split is a
+   linear combination of per-function means, every split is evaluated from that table
+   without further GPU passes.
+
+   ```bash
+   python -m prognosis.axis.token_level_auroc        --projections data/token_projections.npz        --meta data/token_projections_meta.json        --out data/token_level_heldout_auroc_by_layer.csv
+   ```
 
 
 ## Stage 1b: single-turn coding control

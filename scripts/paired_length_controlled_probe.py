@@ -43,12 +43,12 @@ from scipy.stats import binomtest
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2" / "scripts"))
-from paired_probe_ceiling import trajectory_features  # noqa: E402
-from paired_direction_control import load, traj_vectors  # noqa: E402
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from prognosis.analysis.pairs import trajectory_features
+from prognosis.analysis.pairs import load, traj_vectors
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 
 
 def residualise(X_tr, L_tr, X_all, L_all):
@@ -98,7 +98,7 @@ def covariates(meta: pd.DataFrame,
     than silently mismatch, but the fix is to pass the matching projections explicitly.
     """
     feats = pd.read_csv(OUT_DIR / "paired_opening_move_features.csv")
-    proj = pd.read_parquet(projections or ROOT / "projections_paired_new_axis.parquet")
+    proj = pd.read_parquet(projections or ROOT / "data" / "projections_paired.parquet")
     tok = (proj[proj.layer == proj.layer.min()]
            .groupby("trajectory_id", as_index=False).n_gen_tokens.sum())
     key = meta["trajectory_id"]
@@ -112,7 +112,7 @@ def covariates(meta: pd.DataFrame,
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--activations", type=Path, default=ROOT / "paired_meanpool_32b.npz")
+    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "paired_meanpool.npz")
     ap.add_argument("--layer", type=int, default=53, help="new-axis layer for the headline cell")
     ap.add_argument("--C", type=float, default=0.1)
     ap.add_argument("--sweep", action="store_true", help="also sweep all 64 layers")

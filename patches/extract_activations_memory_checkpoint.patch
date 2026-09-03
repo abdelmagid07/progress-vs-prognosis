@@ -1,0 +1,227 @@
+--- a/construction/extract_activations.py
++++ b/construction/extract_activations.py
+@@ -1,22 +1,43 @@
+ """Extract before/after activation means from the ICRL conversations (pipeline step 3 of 4).
+ 
+-Runs Qwen3-8B over every conversation and, in each conversation's first
+-post-discovery paragraph (the first paragraph written AFTER the model figured
+-out the hidden criterion), splits the tokens around the reward words:
++PATCHED VERSION — deliberate, documented deviation from Jiang et al.'s released script.
++The token-classification methodology (find_modified_text_spans / semantic_reward_char_spans /
++classify_tokens) is copied verbatim, unchanged. What changed, and why:
++
++1. Running-sum accumulation instead of per-token lists. The original keeps every single
++   classified token's per-layer activation vector as an individual tensor in a growing Python
++   list (per_fn[label][reward_fn][layer].append(...)) for the ENTIRE run, only reducing to a
++   mean at the very end via torch.stack(...).mean(). Since mean = sum/count, this is
++   mathematically unnecessary — a running (sum, count) per reward_fn/layer/side is sufficient
++   and bounded in size (50 functions x 65 layers x 5120 dims x 2 sides, ~133MB total,
++   regardless of how many conversations/tokens are processed). This is very likely what was
++   silently exhausting memory on a 380-conversation run.
++2. Periodic checkpointing (every CHECKPOINT_EVERY conversations) with resume support — the
++   original writes exactly one output file at the very end and has zero resumability; a
++   kill/crash at conversation 250/380 loses everything. This patch saves the running sums +
++   counts + the set of already-processed conversation IDs to disk periodically (atomic
++   write-then-rename), and on startup loads any existing checkpoint and skips conversations
++   already accounted for.
++3. Live memory printing (current process RSS via /proc/self/status) at every checkpoint, so
++   any future silent death can be correlated with a specific memory level and conversation
++   index instead of being a mystery.
++
++Runs Qwen3-8B (or --model override) over every conversation and, in each conversation's first
++post-discovery paragraph (the first paragraph written AFTER the model figured out the hidden
++criterion), splits the tokens around the reward words:
+ 
+     [... before tokens ...] [reward tokens] [... after tokens ...]
+ 
+-"Before" tokens precede the first reward token (criterion not yet satisfied);
+-"after" tokens follow the last reward token (criterion just satisfied). The value
+-axis is the direction separating these two states. Paragraphs with fewer than
+-MIN_TOKENS_PER_SIDE tokens on either side are excluded. Saves per-reward-function,
+-per-layer means of the before/after residual streams to
+-data/construction/activation_means.pt:
++"Before" tokens precede the first reward token (criterion not yet satisfied); "after" tokens
++follow the last reward token (criterion just satisfied). The value axis is the direction
++separating these two states. Paragraphs with fewer than MIN_TOKENS_PER_SIDE tokens on either
++side are excluded. Saves per-reward-function, per-layer means of the before/after residual
++streams to data/construction/activation_means.pt:
+     {reward_fn: {"before_mean": {layer: tensor(hidden_dim)}, "after_mean": {...},
+                  "before_count": int, "after_count": int}}
+ 
+-Model-agnostic: works with any HuggingFace causal LM (layer count and hidden dim
+-are read from the model config). Needs a GPU.
++Model-agnostic: works with any HuggingFace causal LM (layer count and hidden dim are read from
++the model config). Needs a GPU.
+ Usage: python extract_activations.py [--model Qwen/Qwen3-8B]
+ """
+ 
+@@ -32,6 +53,7 @@
+ 
+ MIN_TOKENS_PER_SIDE = 3
+ MAX_LENGTH = 16384
++CHECKPOINT_EVERY = 10
+ 
+ 
+ def find_modified_text_spans(formatted_text, conv_data):
+@@ -112,10 +134,46 @@
+             for pos in range(n)]
+ 
+ 
++def current_rss_mb():
++    """Current process resident memory in MB, via /proc/self/status (Linux only)."""
++    try:
++        with open("/proc/self/status") as f:
++            for line in f:
++                if line.startswith("VmRSS:"):
++                    kb = int(line.split()[1])
++                    return kb / 1024
++    except Exception:
++        pass
++    return float("nan")
++
++
++def checkpoint_path():
++    return CONSTRUCTION_DATA / "activation_means_checkpoint.pt"
++
++
++def load_checkpoint(n_layers):
++    path = checkpoint_path()
++    if not path.exists():
++        return {}, set()
++    print(f"Resuming from checkpoint: {path}", flush=True)
++    ckpt = torch.load(path, map_location="cpu", weights_only=False)
++    return ckpt["accum"], set(ckpt["processed_ids"])
++
++
++def save_checkpoint(accum, processed_ids):
++    path = checkpoint_path()
++    path.parent.mkdir(parents=True, exist_ok=True)  # original script only created this at the
++    # very end (right before its own final save); checkpointing fires much earlier and needs it
++    # to exist immediately, not just once at completion.
++    tmp_path = path.with_suffix(".tmp")
++    torch.save({"accum": accum, "processed_ids": sorted(processed_ids)}, tmp_path)
++    tmp_path.replace(path)  # atomic on POSIX
++
++
+ @torch.no_grad()
+ def extract_activation_means(model_name):
+     """Forward every conversation through the model and save per-reward-function
+-    per-layer before/after activation means."""
++    per-layer before/after activation means. Resumable via a periodic checkpoint."""
+     output_path = CONSTRUCTION_DATA / "activation_means.pt"
+ 
+     tokenizer = AutoTokenizer.from_pretrained(model_name)
+@@ -131,12 +189,34 @@
+     conversations = load_conversations()
+     print(f"Loaded {len(conversations)} conversations, {len(reward_labels)} labels")
+ 
+-    # per_fn[side][reward_fn][layer] = list of activation vectors
+-    per_fn = {"before": {}, "after": {}}
++    # accum[side][reward_fn][layer] = {"sum": tensor(hidden_dim), "count": int}
++    # Bounded size regardless of how many conversations/tokens are processed — this is the
++    # actual fix for the unbounded-growth memory issue (see module docstring point 1).
++    accum, processed_ids = load_checkpoint(n_layers)
++    if not accum:
++        accum = {"before": {}, "after": {}}
++
++    def ensure_fn(reward_fn):
++        for side in ("before", "after"):
++            if reward_fn not in accum[side]:
++                accum[side][reward_fn] = {
++                    layer: {"sum": torch.zeros(model.config.hidden_size, dtype=torch.float64),
++                            "count": 0}
++                    for layer in range(n_layers)
++                }
++
++    n_skipped = len(processed_ids)
++    if n_skipped:
++        print(f"Skipping {n_skipped} already-processed conversations from checkpoint", flush=True)
+ 
+     for ci, conv in enumerate(conversations):
++        conv_id = conv["conversation_id"]
++        if conv_id in processed_ids:
++            continue
++
+         reward_fn = conv["reward_fn"]
+-        conv_idx = int(conv["conversation_id"].split("__conv")[1])
++        conv_idx = int(conv_id.split("__conv")[1])
++        ensure_fn(reward_fn)
+ 
+         try:
+             formatted = tokenizer.apply_chat_template(
+@@ -161,30 +241,48 @@
+             token_strings, offset_mapping, formatted, conv,
+             reward_fn, rf_by_name[reward_fn]["type"], reward_labels, conv_idx)
+ 
+-        for side in ("before", "after"):
+-            per_fn[side].setdefault(reward_fn, {layer: [] for layer in range(n_layers)})
+-        counts = {"before": 0, "after": 0}
+-        for pos, label in classifications:
+-            if label in counts:
+-                counts[label] += 1
+-                for layer in range(n_layers):
+-                    per_fn[label][reward_fn][layer].append(hidden[layer][pos])
++        before_pos = [pos for pos, label in classifications if label == "before"]
++        after_pos = [pos for pos, label in classifications if label == "after"]
++
++        for label, positions in (("before", before_pos), ("after", after_pos)):
++            if not positions:
++                continue
++            idx = torch.tensor(positions, dtype=torch.long)
++            for layer in range(n_layers):
++                layer_sum = hidden[layer].index_select(0, idx).double().sum(dim=0)
++                accum[label][reward_fn][layer]["sum"] += layer_sum
++                accum[label][reward_fn][layer]["count"] += len(positions)
++
++        processed_ids.add(conv_id)
++        del hidden
+ 
+         if (ci + 1) % 50 == 0 or ci == 0:
+-            print(f"  [{ci+1}/{len(conversations)}] {conv['conversation_id']}: "
+-                  f"{counts['before']} before, {counts['after']} after tokens")
++            print(f"  [{ci+1}/{len(conversations)}] {conv_id}: "
++                  f"{len(before_pos)} before, {len(after_pos)} after tokens")
++
++        if len(processed_ids) % CHECKPOINT_EVERY == 0:
++            save_checkpoint(accum, processed_ids)
++            print(f"  checkpoint saved ({len(processed_ids)}/{len(conversations)} done, "
++                  f"RSS: {current_rss_mb():.0f} MB)", flush=True)
++
++    save_checkpoint(accum, processed_ids)
++    print(f"All {len(processed_ids)} conversations processed. Final RSS: {current_rss_mb():.0f} MB",
++          flush=True)
+ 
+     print("\nComputing per-function means...")
+     result = {}
+-    for fn_name in per_fn["before"]:
+-        b, a = per_fn["before"][fn_name], per_fn["after"][fn_name]
+-        n_b, n_a = len(b[0]), len(a[0])
++    for fn_name in accum["before"]:
++        b, a = accum["before"][fn_name], accum["after"][fn_name]
++        n_b = b[0]["count"]
++        n_a = a[0]["count"]
+         if n_b == 0 or n_a == 0:
+             print(f"  WARNING: {fn_name} has {n_b} before, {n_a} after tokens, skipping")
+             continue
+         result[fn_name] = {
+-            "before_mean": {layer: torch.stack(b[layer]).mean(dim=0) for layer in range(n_layers)},
+-            "after_mean": {layer: torch.stack(a[layer]).mean(dim=0) for layer in range(n_layers)},
++            "before_mean": {layer: (b[layer]["sum"] / b[layer]["count"]).float()
++                            for layer in range(n_layers)},
++            "after_mean": {layer: (a[layer]["sum"] / a[layer]["count"]).float()
++                           for layer in range(n_layers)},
+             "before_count": n_b, "after_count": n_a,
+         }
+         print(f"  {fn_name}: {n_b} before, {n_a} after tokens")
+@@ -192,6 +290,11 @@
+     output_path.parent.mkdir(parents=True, exist_ok=True)
+     torch.save(result, output_path)
+     print(f"\nSaved activation means for {len(result)} functions to {output_path}")
++    # Extraction is fully done and the real output is saved — the checkpoint's only purpose
++    # was mid-run resumability, safe to remove now.
++    ckpt = checkpoint_path()
++    if ckpt.exists():
++        ckpt.unlink()
+ 
+ 
+ if __name__ == "__main__":

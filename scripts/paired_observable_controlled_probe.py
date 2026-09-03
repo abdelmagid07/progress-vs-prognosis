@@ -48,12 +48,12 @@ from scipy.stats import binomtest
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2" / "scripts"))
-from paired_probe_ceiling import trajectory_features  # noqa: E402
-from paired_direction_control import load, traj_vectors  # noqa: E402
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from prognosis.analysis.pairs import trajectory_features
+from prognosis.analysis.pairs import load, traj_vectors
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 
 # The observable block. Step-0 text features come from paired_opening_move_features.csv; the two
 # trajectory-scale features are derived from the projections. Together these are every surface
@@ -151,9 +151,9 @@ def main() -> None:
     # The 50-pair activations, not the 18-pair file the earlier controls defaulted to. Those two
     # differ only by name, so pointing at the wrong one produces a complete, plausible, silently
     # obsolete result rather than an error.
-    ap.add_argument("--activations", type=Path, default=ROOT / "pairs50_meanpool_32b.npz")
+    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "pairs50_meanpool.npz")
     ap.add_argument("--projections", type=Path,
-                    default=ROOT / "projections_pairs50_new_axis.parquet")
+                    default=ROOT / "data" / "projections_pairs50.parquet")
     ap.add_argument("--layer", type=int, default=53, help="new-axis layer for the headline cell")
     ap.add_argument("--C", type=float, default=0.1)
     ap.add_argument("--step0-covariates", action="store_true",

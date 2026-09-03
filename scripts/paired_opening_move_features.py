@@ -46,12 +46,12 @@ from scipy.stats import binomtest, pearsonr, spearmanr
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2" / "scripts"))
-from paired_direction_control import load, traj_vectors  # noqa: E402
-from paired_probe_ceiling import leave_one_pair_out  # noqa: E402
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from prognosis.analysis.pairs import load, traj_vectors
+from prognosis.analysis.pairs import leave_one_pair_out
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 
 HEDGE_RE = re.compile(
     r"\b(might|may|could|perhaps|maybe|possibly|probably|not sure|unsure|uncertain|"
@@ -163,9 +163,9 @@ FEATURE_COLS = ["resp_len_words", "reasoning_len_words", "thought_len_words",
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--activations", type=Path, default=ROOT / "paired_meanpool_32b.npz")
+    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "paired_meanpool.npz")
     ap.add_argument("--trajectories", type=Path,
-                     default=ROOT / "normalized_mixed_within_task.zip")
+                     default=ROOT / "data" / "normalized_pairs.zip")
     ap.add_argument("--layer-new-axis", type=int, default=53)
     ap.add_argument("--C", type=float, default=0.1)
     args = ap.parse_args()

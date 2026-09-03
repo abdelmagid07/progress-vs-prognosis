@@ -45,12 +45,12 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2" / "scripts"))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from analyze_agentic_new_axis import fast_auroc  # noqa: E402
 from paired_opening_move_features import HEDGE_RE, extract_command, split_content  # noqa: E402
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 
 GROUPS = {
     "A_length":    ["n_steps", "total_words"],
@@ -126,8 +126,8 @@ def cv_auroc(X, y, groups, seed=0):
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--trajectories", type=Path,
-                    default=ROOT / "stage2" / "data" / "normalized_full" / "normalized_full")
-    ap.add_argument("--projections", type=Path, default=ROOT / "projections_full_new_axis.parquet")
+                    default=ROOT / "data" / "normalized")
+    ap.add_argument("--projections", type=Path, default=ROOT / "data" / "projections_full.parquet")
     args = ap.parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 

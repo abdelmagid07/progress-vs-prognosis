@@ -37,16 +37,16 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2" / "scripts"))
-from paired_probe_ceiling import trajectory_features  # noqa: E402
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from prognosis.analysis.pairs import trajectory_features
 from paired_direction_geometry import fit_direction, unit, rank_pairs  # noqa: E402
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 
 
 def length_covariate(meta: pd.DataFrame) -> np.ndarray:
-    proj = pd.read_parquet(ROOT / "projections_paired_new_axis.parquet")
+    proj = pd.read_parquet(ROOT / "data" / "projections_paired.parquet")
     tok = (proj[proj.layer == proj.layer.min()]
            .groupby("trajectory_id", as_index=False).n_gen_tokens.sum())
     return meta["trajectory_id"].map(
@@ -55,7 +55,7 @@ def length_covariate(meta: pd.DataFrame) -> np.ndarray:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--activations", type=Path, default=ROOT / "paired_meanpool_32b.npz")
+    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "paired_meanpool.npz")
     ap.add_argument("--C", type=float, default=0.1)
     ap.add_argument("--ref-layer", type=int, default=53)
     args = ap.parse_args()

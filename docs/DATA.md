@@ -20,6 +20,11 @@ token-classification logic is untouched.
 - code: <https://github.com/nickjiang2378/value-axis>, commit `44ad182f1e43902858748d8d4b93835c58ddfe4c`
 - data: <https://huggingface.co/datasets/nickjiang/value-axis>
 
+The patch in `patches/` changes only how activations are accumulated and adds
+checkpointing. `find_modified_text_spans`, `semantic_reward_char_spans`, and
+`classify_tokens` are byte-identical to the pinned upstream file, so which tokens
+count as before or after reward discovery is decided entirely by upstream code.
+
 Of the 50 reward functions in that dataset, 48 yield usable classified tokens and
 build the axis; `ends_with_exclamation` and `starts_with_question` yield none.
 

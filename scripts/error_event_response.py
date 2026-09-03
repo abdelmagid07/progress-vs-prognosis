@@ -40,11 +40,11 @@ import numpy as np
 import pandas as pd
 from scipy.stats import wilcoxon
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2" / "scripts"))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from error_rule import is_error  # noqa: E402
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 
 
 def load_errors(traj_dir: Path) -> pd.DataFrame:
@@ -193,10 +193,10 @@ def peri_event(df: pd.DataFrame, col: str, *, window: int = 3) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--trajectories", type=Path,
-                    default=ROOT / "stage2" / "data" / "normalized_full" / "normalized_full")
-    ap.add_argument("--projections", type=Path, default=ROOT / "projections_full_new_axis.parquet")
+                    default=ROOT / "data" / "normalized")
+    ap.add_argument("--projections", type=Path, default=ROOT / "data" / "projections_full.parquet")
     ap.add_argument("--confidence", type=Path,
-                    default=ROOT / "stage2" / "data" / "confidence.parquet")
+                    default=ROOT / "data" / "confidence.parquet")
     ap.add_argument("--layer", type=int, default=53)
     ap.add_argument("--n-perm", type=int, default=1000,
                     help="within-trajectory relabelling permutations for the null")

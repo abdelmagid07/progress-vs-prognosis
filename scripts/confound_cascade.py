@@ -40,11 +40,11 @@ import numpy as np
 import pandas as pd
 from scipy.stats import binomtest, norm
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2" / "scripts"))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from analyze_agentic_new_axis import _bca_bounds, fast_auroc  # noqa: E402
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 ALPHA = 0.05
 
 
@@ -98,12 +98,12 @@ def wilson(k: int, n: int, alpha: float = ALPHA) -> tuple[float, float]:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--projections", type=Path, default=ROOT / "projections_full_new_axis.parquet")
-    ap.add_argument("--paired", type=Path, default=ROOT / "projections_paired_new_axis.parquet")
+    ap.add_argument("--projections", type=Path, default=ROOT / "data" / "projections_full.parquet")
+    ap.add_argument("--paired", type=Path, default=ROOT / "data" / "projections_paired.parquet")
     ap.add_argument("--layer", type=int, default=53)
     ap.add_argument("--n-boot", type=int, default=2000)
     ap.add_argument("--confidence-paired", type=Path,
-                    default=ROOT / "stage2" / "data" / "confidence_paired.parquet")
+                    default=ROOT / "data" / "confidence_paired.parquet")
     ap.add_argument("--probe-csv", type=Path,
                     default=OUT_DIR / "paired_probe_ceiling.csv")
     ap.add_argument("--probe-C", type=float, default=0.1,

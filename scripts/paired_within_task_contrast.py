@@ -47,8 +47,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import binomtest, wilcoxon
 
-ROOT = Path(__file__).resolve().parents[2]
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+ROOT = Path(__file__).resolve().parents[1]
+OUT_DIR = ROOT / "data"
 
 READOUTS = {
     "final": "score at the trajectory's final step",
@@ -141,7 +141,7 @@ def paired_tests(diffs: np.ndarray) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--projections", type=Path,
-                    default=ROOT / "stage2" / "data" / "projections_paired_new_axis.parquet")
+                    default=ROOT / "data" / "projections_paired.parquet")
     ap.add_argument("--readout", choices=sorted(READOUTS), default="final")
     ap.add_argument("--layer", type=int, default=None,
                     help="Layer to report as the headline. Default: the layer with the "

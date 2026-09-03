@@ -40,11 +40,11 @@ from scipy.stats import binomtest
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2" / "scripts"))
-from paired_probe_ceiling import trajectory_features  # noqa: E402
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from prognosis.analysis.pairs import trajectory_features
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 
 
 def unit(v):
@@ -79,9 +79,9 @@ def loo_rank(X, meta, C):
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--activations", type=Path, default=ROOT / "paired_meanpool_32b.npz")
+    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "paired_meanpool.npz")
     ap.add_argument("--axis", type=Path,
-                    default=ROOT / "stage1" / "data" / "value_axis_32b_faithful.npy")
+                    default=ROOT / "data" / "value_axis.npy")
     ap.add_argument("--layer", type=int, default=53)
     ap.add_argument("--C", type=float, default=0.1)
     ap.add_argument("--sweep", action="store_true")

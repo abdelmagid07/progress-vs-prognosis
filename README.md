@@ -32,7 +32,7 @@ Concretely, the pipeline here:
 | `src/prognosis/analysis/` | Probes, statistics, confound and leakage controls |
 | `src/prognosis/common/` | Paths and chat-template helpers |
 | `tests/` | Offline wiring tests; no GPU or network |
-| `notebooks/` | GPU stages (activation extraction, projection, steering) |
+| `patches/` | Documented deviations from the upstream construction code |
 | `configs/` | Model, agent, and task-selection configuration |
 | `docs/` | Reproduction order and data provenance |
 

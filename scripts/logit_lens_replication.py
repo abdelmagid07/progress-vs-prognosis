@@ -32,11 +32,11 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "stage2" / "scripts"))
-from logit_lens_axis import stream_scores  # noqa: E402
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from prognosis.analysis.logit_lens import stream_scores
 
-OUT_DIR = ROOT / "results" / "numbers" / "new_axis"
+OUT_DIR = ROOT / "data"
 
 # Jiang et al., "Logit Lens: Top Promoted Tokens", in published rank order. Entries their table
 # marks as tokenizer artifacts are kept -- excluding them would be choosing which of their
@@ -53,7 +53,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--shard", type=Path, default=None)
     ap.add_argument("--axis", type=Path,
-                    default=ROOT / "stage1" / "data" / "value_axis_32b_faithful.npy")
+                    default=ROOT / "data" / "value_axis.npy")
     ap.add_argument("--tokenizer", default="Qwen/Qwen3-32B")
     ap.add_argument("--layers", type=int, nargs="+", default=list(range(20, 65, 4)))
     ap.add_argument("--n-random", type=int, default=20)

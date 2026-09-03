@@ -15,7 +15,8 @@ in the released repository. Nothing else in this repository refers to it.
       the batch runner, and the agent configs. 39 tests pass.
       Excluded: the local no-Docker dev harness (~1,100 lines). It generated no paper
       data and its only callers were dev smoke notebooks.
-- [ ] **Stage 4 - extraction and projection.** `src/prognosis/extract/`.
+- [x] **Stage 4 - extraction and projection.** `src/prognosis/extract/`
+      (project_steps, token_spans, hooks).
 - [ ] **Stage 5 - analysis.** `src/prognosis/analysis/` beyond stats.py.
 - [ ] **Stage 6 - dropped.** Derived results are not shipped; the code regenerates them.
 - [ ] **Stage 7 - notebooks.** Highest leak surface; port last, after a full scrub.

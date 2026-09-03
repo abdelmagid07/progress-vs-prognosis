@@ -92,8 +92,6 @@ def test_assistant_message_maps_azure_reasoning():
 
 
 def test_parse_fixture_still_works():
-    path = Path(__file__).resolve().parents[1] / "fixtures" / "sample_mini.traj.json"
-    if not path.exists():
-        return
+    path = Path(__file__).resolve().parent / "fixtures" / "sample_mini.traj.json"
     rec = parse_mini_swe_traj(path, outcome=1)
     assert rec.n_steps >= 1

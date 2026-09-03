@@ -8,7 +8,7 @@ those stages produce.
 | 1 | Reconstruct the value axis and verify it single-turn | yes | `notebooks/` |
 | 1b | Single-turn coding control on DebugBench | yes | `prognosis.single_turn` |
 | 2 | Generate agent trajectories, ingest, elicit confidence | no (served model) | `prognosis.agent` |
-| 3 | Extract activations and project onto the axis | yes | `notebooks/` |
+| 3 | Extract activations and project onto the axis | yes | `prognosis.extract` |
 | 4 | Across-task and within-task readouts | no | `prognosis.analysis` |
 | 5 | Probes, confound cascade, leakage controls | no | `prognosis.analysis` |
 | 6 | Error-response and elicited-confidence analyses | no | `prognosis.analysis` |
@@ -81,3 +81,19 @@ python -m prognosis.agent.confidence
 `results.json` and writes one normalized record per trajectory. `confidence` then
 re-reads each saved prefix and elicits a verbalized P(success) in a separate forward
 pass, so the trajectories under study are never modified by the elicitation.
+
+
+## Stage 3: activations and projections
+
+One forward pass per trajectory step. For every layer it records the mean cosine
+between the axis and the agent-generated tokens of that step, keeps the final-token
+cosine as a robustness column, and dumps the mean-pooled activation vectors the
+probes are later fitted on, so the model is never replayed.
+
+```bash
+python -m prognosis.extract.project_steps --traj-dir data/normalized/<run>     --output data/projections.parquet --save-activations
+```
+
+The generated region of a step is the whole assistant block, reasoning and
+tool-call render included, not just the final token. The run checkpoints per
+trajectory and resumes, and can mirror both outputs to durable storage as it goes.

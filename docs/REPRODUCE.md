@@ -7,7 +7,7 @@ those stages produce.
 |---|---|---|---|
 | 1 | Reconstruct the value axis and verify it single-turn | yes | `notebooks/` |
 | 1b | Single-turn coding control on DebugBench | yes | `prognosis.single_turn` |
-| 2 | Select tasks and generate agent trajectories | no (served model) | `prognosis.agent` |
+| 2 | Generate agent trajectories, ingest, elicit confidence | no (served model) | `prognosis.agent` |
 | 3 | Extract activations and project onto the axis | yes | `notebooks/` |
 | 4 | Across-task and within-task readouts | no | `prognosis.analysis` |
 | 5 | Probes, confound cascade, leakage controls | no | `prognosis.analysis` |
@@ -63,3 +63,21 @@ Three readouts are computed in the same pass. The window readout is the one
 comparable to the original paper: it averages only over tokens after the point
 where the correct and corrupted code diverge. The whole-span mean is diluted by a
 positional ramp unrelated to correctness, and is reported for completeness only.
+
+
+## Stage 2: agent trajectories
+
+Rollouts run against an OpenAI-compatible endpoint serving the model, so this stage
+needs a served model but no local GPU. `configs/providers/` holds the two request
+shapes; select one with `MODEL_PROVIDER` rather than editing the model config.
+
+```bash
+bash scripts/run_mini_swe_batch.sh configs/selected_instances.txt
+python -m prognosis.agent.ingest_batch --traj-dir data/trajectories/<run>     --format mini-swe-agent
+python -m prognosis.agent.confidence
+```
+
+`ingest_batch` labels each trajectory resolved or unresolved from the run's
+`results.json` and writes one normalized record per trajectory. `confidence` then
+re-reads each saved prefix and elicits a verbalized P(success) in a separate forward
+pass, so the trajectories under study are never modified by the elicitation.

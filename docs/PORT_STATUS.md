@@ -10,8 +10,11 @@ in the released repository. Nothing else in this repository refers to it.
 - [x] **Stage 2b - single-turn control.** `src/prognosis/single_turn/`, plus the
       shared `analysis/stats.py`, `extract/hooks.py`, `common/chat.py` it needs.
       30 tests pass.
-- [ ] **Stage 3 - agent rollouts.** `src/prognosis/agent/`, task selection, normalization,
-      elicited confidence.
+- [x] **Stage 3 - agent rollouts.** `src/prognosis/agent/` (schema, both trajectory
+      parsers, ingestion, elicited confidence), `common/{config,provider,projection}.py`,
+      the batch runner, and the agent configs. 39 tests pass.
+      Excluded: the local no-Docker dev harness (~1,100 lines). It generated no paper
+      data and its only callers were dev smoke notebooks.
 - [ ] **Stage 4 - extraction and projection.** `src/prognosis/extract/`.
 - [ ] **Stage 5 - analysis.** `src/prognosis/analysis/` beyond stats.py.
 - [ ] **Stage 6 - dropped.** Derived results are not shipped; the code regenerates them.

@@ -1,0 +1,16 @@
+# Provider: self-hosted / Colab vLLM (OpenAI-compatible).
+# Use: MODEL_PROVIDER=vllm  (default)
+#
+# Requires server flags: --enable-auto-tool-choice --tool-call-parser hermes
+#   --reasoning-parser qwen3  (see scripts/serve_qwen.sh).
+# Response field: reasoning_content (vLLM reasoning parser).
+
+provider: vllm
+thinking_mode: explicit   # must send chat_template_kwargs.enable_thinking=true
+
+model:
+  model_kwargs:
+    extra_body:
+      top_k: 20
+      chat_template_kwargs:
+        enable_thinking: true

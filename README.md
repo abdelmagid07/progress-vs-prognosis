@@ -47,7 +47,7 @@ pip install -e .          # add '[agent]' for SWE-bench rollouts
 cp .env.example .env      # fill in an OpenAI-compatible endpoint
 ```
 
-Model: Qwen3-32B, with thinking disabled for agent rollouts. Analyses index the
+Model: Qwen3-32B in bfloat16, thinking enabled, throughout. Analyses index the
 model's 64 transformer blocks; the axis carries 65 rows because its construction is
 embedding-inclusive, so axis row `L+1` corresponds to block `L`. This offset matters
 whenever a layer number is compared across the two.

@@ -1,0 +1,25 @@
+# Provider: Azure AI Foundry managed compute (OpenAI-compatible /openai/v1).
+# Use: MODEL_PROVIDER=azure
+#
+# Validated 2026-07-26 against qwen3-32b on Global Managed Compute:
+#   - REJECTS: chat_template_kwargs, enable_thinking, top_k
+#   - ACCEPTS: temperature, top_p, seed (extra_body.seed or top-level)
+#   - Thinking ON by default; soft-switch via /think and /no_think in user text
+#   - Reasoning text arrives as message.reasoning (NOT reasoning_content);
+#     parse_mini_swe_traj normalizes reasoning → reasoning_content on ingest
+#   - Structured tool_calls work
+#
+# Suggested env:
+#   MODEL_PROVIDER=azure
+#   MODEL_API_BASE=https://<resource>.services.ai.azure.com/openai/v1
+#   MODEL_API_KEY=<foundry key>
+#   MODEL_NAME=openai/qwen3-32b    # litellm openai/* + deployment name
+
+provider: azure
+thinking_mode: default_on   # server default; do not send rejected kwargs
+
+model:
+  model_kwargs:
+    # Keep extra_body present so the runner can inject seed= without creating
+    # a sibling that reintroduces vLLM-only keys.
+    extra_body: {}

@@ -1,0 +1,18 @@
+# Agentic transfer: Qwen3-32B on SWE-bench Verified, read against the frozen axis.
+model: Qwen/Qwen3-32B
+n_layers: 64
+hidden_dim: 5120
+enable_thinking: true
+dtype: bfloat16
+
+# Frozen axis from the reconstruction, never refit. Regenerated, not shipped.
+axis_path: data/value_axis.npy
+axis_manifest_path: data/axis_manifest.json
+# Reported layer for the agentic analyses. Selected post hoc at the peak of the
+# layer sweep, and labeled as such wherever it appears. The axis is
+# embedding-inclusive, so this row reads transformer block 52.
+primary_layer: 53
+
+n_bins: 5
+step_limit: 60
+max_observations_in_context: 5

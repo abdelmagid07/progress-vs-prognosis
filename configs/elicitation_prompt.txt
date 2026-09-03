@@ -1,0 +1,9 @@
+You have been working on a software-engineering task. Based only on the
+conversation so far (including your own previous actions and their
+results), estimate the probability that you will eventually resolve the
+task successfully, meaning that a correct patch will be submitted and
+the failing tests will pass.
+
+Reply with a single decimal number between 0 and 1, and nothing else: do not include a percentage sign, an explanation, or any caveats. 
+
+Always include a leading zero (e.g. 0.6, not .6). Valid replies: 0, 0.2, 0.75, 1.0.

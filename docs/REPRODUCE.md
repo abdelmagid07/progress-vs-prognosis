@@ -9,9 +9,9 @@ those stages produce.
 | 1b | Single-turn coding control on DebugBench | yes | `prognosis.single_turn` |
 | 2 | Generate agent trajectories, ingest, elicit confidence | no (served model) | `prognosis.agent` |
 | 3 | Extract activations and project onto the axis | yes | `prognosis.extract` |
-| 4 | Across-task and within-task readouts | no | `prognosis.analysis` |
-| 5 | Probes, confound cascade, leakage controls | no | `prognosis.analysis` |
-| 6 | Error-response and elicited-confidence analyses | no | `prognosis.analysis` |
+| 4 | Across-task and within-task readouts | no | `scripts/` |
+| 5 | Probes, confound cascade, leakage controls | no | `scripts/` |
+| 6 | Error-response and elicited-confidence analyses | no | `scripts/` |
 
 ## Paper section to script
 
@@ -97,3 +97,49 @@ python -m prognosis.extract.project_steps --traj-dir data/normalized/<run>     -
 The generated region of a step is the whole assistant block, reasoning and
 tool-call render included, not just the final token. The run checkpoints per
 trajectory and resumes, and can mirror both outputs to durable storage as it goes.
+
+
+## Stages 4-6: analyses
+
+Each script reads the projection tables from stage 3 and writes one JSON or CSV under
+`data/`, and carries the exact command in its docstring. All are CPU-only. Grouped by
+the part of the paper they support:
+
+**Across-task readout**
+
+| Script | Reports |
+|---|---|
+| `analyze_agentic_new_axis.py` | Final-step AUROC, the layer sweep, per-position bins |
+| `readout_and_termination_checks.py` | Run termination and trajectory length |
+| `logit_lens_replication.py` | Vocabulary ranking of the axis under a logit lens |
+
+**Within-task readout and probes**
+
+| Script | Reports |
+|---|---|
+| `paired_within_task_contrast.py` | Frozen axis within task, matched-prefix |
+| `confound_cascade.py` | The cascade from pooled separation to matched pairs |
+| `paired_direction_geometry.py` | Angle between the outcome direction and the axis |
+| `paired_direction_structure.py` | Split-half stability of the outcome direction |
+| `axis_vs_text_incremental.py` | Combined axis-plus-text model |
+
+**Leakage controls**
+
+| Script | Reports |
+|---|---|
+| `text_only_baseline.py` | Trajectory-level text baseline |
+| `paired_opening_move_features.py` | Step-0 text baseline |
+| `paired_length_controlled_probe.py` | Length residualization |
+| `paired_observable_controlled_probe.py` | Nine-feature observable residualization |
+| `paired_axis_residualised_probe.py` | Residualizing against the value axis |
+
+**Error response**
+
+| Script | Reports |
+|---|---|
+| `error_rule.py` | Error definition, text rules against exit status |
+| `error_categories.py` | Measurable responses by error category |
+| `error_event_response.py` | Trajectory-level contrast and event-aligned time course |
+
+The probe fitting itself lives in `prognosis.analysis.fit_probes`; the shared
+interval, permutation, and paired-test machinery in `prognosis.analysis.stats`.

@@ -17,7 +17,12 @@ in the released repository. Nothing else in this repository refers to it.
       data and its only callers were dev smoke notebooks.
 - [x] **Stage 4 - extraction and projection.** `src/prognosis/extract/`
       (project_steps, token_spans, hooks).
-- [ ] **Stage 5 - analysis.** `src/prognosis/analysis/` beyond stats.py.
+- [x] **Stage 5 - analysis.** `prognosis/analysis/` (fit_probes, by_position,
+      final_step, internal_vs_elicited, run_analyses, signal_to_noise,
+      noise_by_token_type) and 15 scripts, one per reported analysis.
+      Selected against the appendix's own paragraph list. Excluded: ~20 scripts
+      that returned nulls or never reached the paper, plus figure and tooling
+      scripts. See the open triage questions at the bottom of this file.
 - [ ] **Stage 6 - dropped.** Derived results are not shipped; the code regenerates them.
 - [ ] **Stage 7 - notebooks.** Highest leak surface; port last, after a full scrub.
 - [ ] **Final - anonymity sweep.** See the checklist below, then delete this file.
@@ -45,3 +50,22 @@ Known leak sites in the source repository, to verify absent here before release:
 Not leaks, deliberately kept: references to the prior work's public repository and
 dataset. That is cited prior work the paper builds on, and removing it would break
 the axis provenance.
+
+
+## Script selection
+
+One script per result claim in the body of the paper. Robustness checks, figure
+inputs, and analyses that did not reach the paper are not shipped; the paper is
+where the method is described, and this repository is where the reported numbers
+are recomputed.
+
+Resolved:
+
+- `axis_vs_text_incremental.py` - shipped. The combined axis-plus-text model is a
+  body claim.
+- `paired_probe_ceiling.py`, `paired_probe_margins.py` - dropped. Figure inputs.
+- `paired_confound_checks.py`, `confound_checks_new_axis.py` - dropped. Robustness
+  checks; the cascade covers what the body reports.
+- `probe_length_confound.py` - dropped. Superseded by the length-residualized probe.
+- `single_turn_form_vs_length.py` - dropped. Follow-up, not a body claim.
+- `steer_confidence.py` - dropped. The steering experiment is not in this paper.

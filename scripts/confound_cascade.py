@@ -42,7 +42,7 @@ from scipy.stats import binomtest, norm
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from analyze_agentic import _bca_bounds, fast_auroc  # noqa: E402
+from analyze_agentic import _bca_bounds, fast_auroc, require_axis_row_layers  # noqa: E402
 
 OUT_DIR = ROOT / "data"
 ALPHA = 0.05
@@ -114,7 +114,7 @@ def main() -> None:
     args = ap.parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    full = pd.read_parquet(args.projections)
+    full = require_axis_row_layers(pd.read_parquet(args.projections), args.projections)
     L = full[full.layer == args.layer]
 
     # ---- row 1: pooled, final step ----------------------------------------
@@ -151,7 +151,7 @@ def main() -> None:
               for k in sorted(np.unique(q))]
 
     # ---- rows 4-5: same task (paired) -------------------------------------
-    P = pd.read_parquet(args.paired)
+    P = require_axis_row_layers(pd.read_parquet(args.paired), args.paired)
     PL = P[P.layer == args.layer]
     pf = PL.sort_values("step_index").groupby(["task_id", "outcome"], as_index=False).tail(1)
     piv_f = pf.pivot_table(index="task_id", columns="outcome", values="proj_mean").dropna()

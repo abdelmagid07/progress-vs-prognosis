@@ -1,9 +1,12 @@
 #!/usr/bin/env python
-"""Put a paired projection table into the layer numbering the paired analyses expect.
+"""Put a projection table into the layer numbering the analyses expect.
+
+Applies to both projection tables: pass ``--path data/projections_full.parquet`` for the
+main run and the default for the paired table.
 
 Two conventions exist and they differ by one, silently rather than loudly.
 
-``project_steps.py`` writes ``layer`` in captured-block numbering, 0..63. The paired analyses
+``project_steps.py`` writes ``layer`` in captured-block numbering, 0..63. The analyses
 are written against axis-row numbering, 1..64, with a ``layer_captured_block`` column holding
 0..63 alongside: they filter ``df["layer"] == 53`` meaning axis row 53, that is captured block
 52. The npz path reaches the same place from the other side, filtering
@@ -14,7 +17,7 @@ produces plausible numbers at the wrong depth.
 
 Idempotent: re-running on an already-converted file changes nothing.
 
-Reproduce: python scripts/normalize_pair_layers.py
+Reproduce: python scripts/normalize_pair_layers.py --path data/projections_full.parquet
 """
 
 from __future__ import annotations

@@ -35,8 +35,10 @@ def interpret_report(
         lines.append(
             f"Final-step AUROC {auroc:.3f} "
             f"[{final.get('auroc_ci_low'):.3f}, {final.get('auroc_ci_high'):.3f}] "
-            f"vs majority baseline {final.get('majority_baseline'):.3f}: {verdict}; "
-            f"permutation p={final.get('permutation_p')}."
+            f"against the 0.500 AUROC decision line: {verdict}; "
+            f"permutation p={final.get('permutation_p')}. "
+            f"(Majority-class accuracy {final.get('majority_baseline'):.3f} is an accuracy, "
+            f"not an AUROC; reported for class-imbalance context only.)"
         )
     else:
         lines.append("Final-step AUROC undefined (single outcome class).")

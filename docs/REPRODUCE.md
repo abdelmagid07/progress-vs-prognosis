@@ -148,11 +148,17 @@ probes are later fitted on, so the model is never replayed.
 
 ```bash
 python -m prognosis.extract.project_steps --traj-dir data/normalized/<run>     --output data/projections_full.parquet --activations-npz data/full_meanpool.npz
+python scripts/normalize_pair_layers.py --path data/projections_full.parquet
 ```
 
 The generated region of a step is the whole assistant block, reasoning and
 tool-call render included, not just the final token. The run checkpoints per
 trajectory and resumes, and can mirror both outputs to durable storage as it goes.
+
+The normalisation step is required, not optional. ``project_steps`` writes ``layer``
+in captured-block numbering (0..63); every analysis below reads ``layer`` as the
+axis row (1..64). Skipping it shifts every layer by one and produces plausible
+numbers at the wrong depth.
 
 
 ## Stages 4-6: analyses

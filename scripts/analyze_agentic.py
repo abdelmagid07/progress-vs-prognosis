@@ -52,6 +52,25 @@ OUT_DIR = ROOT / "data"
 CHANCE = 0.5
 
 
+def require_axis_row_layers(df: pd.DataFrame, path) -> pd.DataFrame:
+    """Refuse a projection table still in captured-block numbering.
+
+    ``project_steps`` writes ``layer`` as the captured block (0..63); every analysis
+    here reads ``layer`` as the axis row (1..64). A block-numbered table shifts every
+    layer by one and yields plausible numbers at the wrong depth, so fail loudly
+    instead of reporting the wrong depth silently.
+    """
+    if "layer" not in df.columns:
+        return df
+    if int(df["layer"].min()) == 0:
+        raise SystemExit(
+            f"{path} is in captured-block numbering (layer starts at 0); the analyses "
+            "read layer as the axis row (1..64). Normalise it first: "
+            f"python scripts/normalize_pair_layers.py --path {path}"
+        )
+    return df
+
+
 def fast_auroc(outcome: np.ndarray, score: np.ndarray) -> float:
     """Mann-Whitney AUROC, tie-aware (matches sklearn's roc_auc_score)."""
     n_pos = int(outcome.sum())
@@ -201,7 +220,7 @@ def main() -> None:
     args = ap.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    df = pd.read_parquet(args.projections)
+    df = require_axis_row_layers(pd.read_parquet(args.projections), args.projections)
     finals = final_step_rows(df)
 
     if args.steps_only is not None:
@@ -281,9 +300,10 @@ def main() -> None:
     #                     trajectory per bin. Position-matched with no differential
     #                     averaging, so this is the one to trust.
     #
-    # On this data the difference is not cosmetic: bin 0 reads 0.52 under binmean and
-    # 0.72 under midstep, i.e. the "no early separation" pattern is an artifact of the
-    # averaging, not a property of the axis.
+    # On this data the two readouts agree closely in the early bins (bin 0: 0.52 binmean
+    # vs 0.53 midstep) and diverge most in the final bin (0.74 binmean vs 0.64 midstep),
+    # where the bin mean is the more favourable number. The differential smoothing is
+    # real regardless, so the position-matched readout is the one to report.
     print(f"\nPosition-bin evolution at layer {peak_layer} ({args.n_bins} bins)...", flush=True)
     at_peak = df[df["layer"] == peak_layer].copy()
     edges = np.linspace(0.0, 1.0, args.n_bins + 1)
@@ -372,9 +392,12 @@ def main() -> None:
             "Peak layer selected post-hoc from the same trajectories used to report it; "
             "the peak-layer AUROC is optimistically biased and is exploratory, not held-out.",
             "Position bins: use auroc_midstep, not auroc_binmean. rel_pos bins span more "
-            "absolute steps for longer (predominantly unresolved) trajectories, so averaging "
-            "within a bin smooths the two classes unequally and manufactures a spurious "
-            "'no early separation' pattern (bin 0: 0.52 binmean vs 0.72 midstep).",
+            "absolute steps for longer (predominantly unresolved) trajectories -- about "
+            "2 steps per bin for resolved runs against about 5.5 for unresolved -- so a "
+            "bin mean smooths the two classes unequally and is not position-matched. The "
+            "two readouts agree closely in the early bins (bin 0: 0.52 binmean vs 0.53 "
+            "midstep) and diverge most in the final bin (0.74 binmean vs 0.64 midstep), "
+            "where the bin mean is the more favourable of the two.",
             "Separation is present from step 0 onward, before the agent has meaningfully "
             "acted, which is consistent with the axis reading static task difficulty off the "
             "prompt rather than tracking trajectory progress. See confound_cascade.json.",

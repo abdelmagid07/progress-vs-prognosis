@@ -44,7 +44,7 @@ from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from analyze_agentic import fast_auroc  # noqa: E402
+from analyze_agentic import fast_auroc, require_axis_row_layers  # noqa: E402
 from text_only_baseline import GROUPS, PAPER_TRAJECTORY_FEATURES, featurise  # noqa: E402
 
 OUT_DIR = ROOT / "data"
@@ -78,7 +78,7 @@ def main() -> None:
     rows = [f for f in (featurise(p) for p in sorted(args.trajectories.glob("*.json"))) if f]
     txt = pd.DataFrame(rows)
 
-    proj = pd.read_parquet(args.projections)
+    proj = require_axis_row_layers(pd.read_parquet(args.projections), args.projections)
     L = proj[proj.layer == args.layer]
     fin = (L.sort_values("step_index").groupby("trajectory_id", as_index=False).tail(1)
            [["trajectory_id", "proj_mean"]].rename(columns={"proj_mean": "axis_final"}))

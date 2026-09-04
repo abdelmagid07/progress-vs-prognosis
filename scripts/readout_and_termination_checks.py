@@ -39,7 +39,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from analyze_agentic import fast_auroc, fast_auroc_bca  # noqa: E402
+from analyze_agentic import fast_auroc, fast_auroc_bca, require_axis_row_layers  # noqa: E402
 
 OUT_DIR = ROOT / "data"
 
@@ -78,7 +78,7 @@ def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     ex = load_exit_status(args.trajectories)
-    proj = pd.read_parquet(args.projections)
+    proj = require_axis_row_layers(pd.read_parquet(args.projections), args.projections)
     L = proj[proj.layer == args.layer].merge(ex, on="trajectory_id", how="left")
     if L.exit_status.isna().any():
         raise SystemExit("some projected trajectories have no exit_status; check the traj dir")

@@ -25,8 +25,8 @@ from scipy.stats import norm
 from sklearn.metrics import roc_auc_score
 
 # The AUROC of a majority-class (constant) predictor: the line a real signal's
-# confidence interval must exclude ("signal iff CI excludes the majority
-# baseline").
+# confidence interval must exclude. This is 0.5, NOT the majority-class accuracy
+# reported by majority_baseline(), which is a different quantity.
 CHANCE_AUROC = 0.5
 
 

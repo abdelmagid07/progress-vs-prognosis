@@ -41,6 +41,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from analyze_agentic import require_axis_row_layers  # noqa: E402
 from error_rule import is_error  # noqa: E402
 
 OUT_DIR = ROOT / "data"
@@ -93,7 +94,7 @@ def main() -> None:
         for p in sorted(args.trajectories.glob("*.json"))
         for s in json.loads(p.read_text(encoding="utf-8")).get("steps", []))
 
-    proj = pd.read_parquet(args.projections)
+    proj = require_axis_row_layers(pd.read_parquet(args.projections), args.projections)
     axis = (proj[proj.layer == args.layer][["trajectory_id", "step_index", "proj_mean"]]
             .rename(columns={"proj_mean": "axis"}))
     df = (axis.merge(lab, on=["trajectory_id", "step_index"], how="inner")

@@ -219,8 +219,8 @@ def main() -> None:
             "Mixed-outcome tasks are a non-random, intermediate-difficulty subset; the "
             "contrast is interpreted within that scope.",
             f"With {n_pairs} pairs the sign test needs {need} to reach p<0.05, and power "
-            "is ~0.6 even if the true within-pair rate matched the pooled AUROC. A null "
-            "here is inconclusive, not evidence of absence.",
+            "is ~0.94 if the true within-pair rate matched the pooled AUROC (0.747). A null "
+            "here is therefore informative rather than merely underpowered.",
         ],
     }
     if args.layer is None:

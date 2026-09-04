@@ -174,12 +174,12 @@ def main() -> None:
     k_mean = int((piv_m[1] > piv_m[0]).sum())
 
     # --- reference row: a probe FIT in-domain, same 50 pairs -----------------
-    # Not part of the cascade: this row varies the METHOD, not the conditioning, so it is drawn
+    # Not part of the cascade: this row varies the method, not the conditioning, so it is drawn
     # below a divider. It is here because the cascade alone invites "there was never anything to
     # detect" -- this row shows the information is near ceiling exactly where the frozen axis
     # bottoms out. Read from paired_probe_ceiling.csv, which applies the step-count truncation
-    # and L2 normalisation the probe result requires; paired_direction_control.py's all-steps
-    # row omits the truncation and reads 18/18 here instead of 17/18.
+    # and L2 normalisation the probe result requires; without the truncation this row reads a
+    # length channel rather than an outcome one.
     pc = pd.read_csv(args.probe_csv)
     cell = pc[(pc.axis_layer == args.layer) & (pc.C == args.probe_C)]
     if len(cell) != 1:
@@ -187,10 +187,10 @@ def main() -> None:
     k_probe = int(cell.n_correct.iloc[0])
     n_probe = int(cell.n_pairs.iloc[0])
 
-    # LABELS. The first three rows pool UNPAIRED trajectories, so calling them "All pairs" (as an
-    # earlier version did) named the wrong design and invited exactly the confusion the figure
-    # exists to prevent. "Across tasks" / "Within task" names the design directly, which is the
-    # distinction the whole figure exists to draw.
+    # LABELS. The first three rows pool UNPAIRED trajectories, so calling them "All pairs" would
+    # name the wrong design and invite exactly the confusion the figure exists to prevent.
+    # "Across tasks" / "Within task" names the design directly, which is the distinction the
+    # whole figure exists to draw.
     #
     # SUBLABELS carry one kind of thing only: the evidence base. They previously mixed editorial
     # commentary ("the headline result"), a method detail ("length quartiles") and sign counts

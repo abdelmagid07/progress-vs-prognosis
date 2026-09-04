@@ -11,7 +11,7 @@ meaningfully acted).
 
 This script asks the question with difficulty held fixed. For each layer:
 
-  leave-one-PAIR-out: fit an L2 logistic probe on the 17 remaining pairs (34 trajectories),
+  leave-one-PAIR-out: fit an L2 logistic probe on the 49 remaining pairs (98 trajectories),
   score the held-out pair's two trajectories, and record whether the resolved arm scores
   above the unresolved one.
 
@@ -19,7 +19,7 @@ That yields one held-out binary outcome per pair per layer -> exact sign test. B
 is a within-pair comparison, task difficulty cancels in the test itself, so a probe cannot
 score by recognising the task.
 
-POWER AND DIMENSIONALITY. 34 training points in 5120 dimensions are always linearly
+POWER AND DIMENSIONALITY. 98 training points in 5120 dimensions are always linearly
 separable, so the training fit is meaningless and only the held-out comparison counts.
 Regularisation is swept (C) rather than tuned, since tuning on the same pairs used for
 evaluation would leak. With 50 pairs an exact sign test needs 33 to reach p<0.05, so this is

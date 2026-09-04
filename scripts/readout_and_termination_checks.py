@@ -12,7 +12,7 @@ do not answer.
    a reader to discover, so this script tabulates every natural readout at the headline layer.
 
 2. WHAT DOES "FINAL STEP" MEAN? It is not the same kind of event in both classes. Every
-   resolved run ends by submitting a patch, but 115 of 439 unresolved runs (26%) end in
+   resolved run ends by submitting a patch, but 115 of 438 unresolved runs (26%) end in
    ``LimitsExceeded`` -- the harness cutting them off at the 60-step budget -- and no resolved
    run does. For a quarter of the unresolved class the "final step" is therefore an arbitrary
    truncation, not a conclusion the agent reached, and the readout is partly comparing

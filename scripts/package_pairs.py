@@ -16,7 +16,7 @@ pipeline is what makes the two sides of a pair comparable rather than differentl
 Output: data/normalized_pairs/ and data/normalized_pairs.zip, which stage 3 projects into
 data/projections_pairs50.parquet and data/pairs50_meanpool.npz.
 
-Reproduce: python scripts/package_pairs.py
+Reproduce: python scripts/package_pairs.py --main-run-normalized data/normalized/<run>
 """
 
 from __future__ import annotations

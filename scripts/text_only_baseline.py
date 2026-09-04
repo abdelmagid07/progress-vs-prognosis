@@ -11,7 +11,7 @@ This also scales up two findings from the within-task pair set:
 
   * the opening-move result (arms that resolve reason longer at step 0), and
   * the qualitative lead from the extremes analysis, that low-scoring steps are re-issues of a
-    failing command -- here measured as a command-repetition rate over all 500 trajectories.
+    failing command -- here measured as a command-repetition rate over all 499 trajectories.
 
 FEATURE GROUPS are reported separately, because they are not equally interesting. Length is
 already known to beat the axis (separability 0.780) and would otherwise carry the combined
@@ -58,13 +58,13 @@ GROUPS = {
     "C_behaviour": ["repeat_rate", "error_rate", "write_frac"],
 }
 
-# The trajectory-level baseline exactly as METHOD defines it: "four observable properties of the
+# The trajectory-level baseline exactly as the paper's method section defines it: "four observable properties of the
 # run: total generated words, number of trajectory steps, command repetition rate, and error
 # observation rate". No such model existed here. Those four are split across A_length and
-# C_behaviour, and C_behaviour carries a fifth feature (write_frac) the Method does not name, so
+# C_behaviour, and C_behaviour carries a fifth feature (write_frac) that description does not name, so
 # the paper was quoting an eight-feature number for a four-feature claim. Kept separate from
 # GROUPS because GROUPS is summed to build "all text features" and these four are a subset.
-METHOD_TRAJECTORY_FEATURES = ["total_words", "n_steps", "repeat_rate", "error_rate"]
+PAPER_TRAJECTORY_FEATURES = ["total_words", "n_steps", "repeat_rate", "error_rate"]
 
 from error_rule import is_error  # noqa: E402
 
@@ -154,8 +154,8 @@ def main() -> None:
         combos[name] = cv_auroc(df[cols].to_numpy(float), y, df.task_id)
     combos["B_opening + C_behaviour (no length)"] = cv_auroc(
         df[GROUPS["B_opening"] + GROUPS["C_behaviour"]].to_numpy(float), y, df.task_id)
-    combos["four trajectory features (Method)"] = cv_auroc(
-        df[METHOD_TRAJECTORY_FEATURES].to_numpy(float), y, df.task_id)
+    combos["four trajectory features (as defined in the paper)"] = cv_auroc(
+        df[PAPER_TRAJECTORY_FEATURES].to_numpy(float), y, df.task_id)
     combos["all text features"] = cv_auroc(
         df[sum(GROUPS.values(), [])].to_numpy(float), y, df.task_id)
     print("\nfitted text-only models (task-level 5-fold CV, held-out AUROC):")

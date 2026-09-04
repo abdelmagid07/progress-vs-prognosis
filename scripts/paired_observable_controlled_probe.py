@@ -12,7 +12,7 @@ after every measurable surface property is removed simultaneously, "it is really
 verbosity/hedging/command style" stops being available as an explanation.
 
 WHY THIS MATTERS. Within these pairs trajectory length is not balanced: the resolved arm is
-shorter in 31 of 50 pairs and length reaches AUROC 0.682, close to the 0.780 it reaches on
+shorter in 32 of 50 pairs and length reaches AUROC 0.682, close to the 0.780 it reaches on
 the full run. Length is therefore a live confound in this set rather
 than a hypothetical one, and a control that removes it -- along with everything else observable --
 is doing real work.
@@ -153,7 +153,7 @@ def main() -> None:
     ap.add_argument("--activations", type=Path, default=ROOT / "data" / "pairs50_meanpool.npz")
     ap.add_argument("--projections", type=Path,
                     default=ROOT / "data" / "projections_pairs50.parquet")
-    ap.add_argument("--layer", type=int, default=53, help="new-axis layer for the headline cell")
+    ap.add_argument("--layer", type=int, default=53, help="axis-row layer for the headline cell")
     ap.add_argument("--C", type=float, default=0.1)
     ap.add_argument("--step0-covariates", action=argparse.BooleanOptionalAction, default=True,
                     help="restrict the first-step readout to the seven step-0 features")

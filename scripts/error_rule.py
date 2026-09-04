@@ -27,7 +27,8 @@ WHAT THIS DOES NOT CAPTURE. A command that exits zero while doing the wrong thin
 These are operational labels for "the command failed", not a judgement about whether the agent is
 making progress, and the paper should say so wherever it uses the word "error".
 
-Reproduce: python scripts/error_rule.py
+This module defines the rule only; it is imported by the error analyses and
+produces no output of its own.
 """
 
 from __future__ import annotations

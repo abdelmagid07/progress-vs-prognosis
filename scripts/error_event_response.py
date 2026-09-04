@@ -85,7 +85,7 @@ def shuffle_null(df: pd.DataFrame, col: str, *, n_perm: int, seed: int = 0) -> d
 
     Not the same as a random-direction control, which would ask whether any direction responds
     this way and needs per-step projections of all 499 trajectories onto random vectors. Those
-    activations are not in the repository; only the 36 paired trajectories are stored.
+    activations are not in the repository; only the 100 paired trajectories are stored.
     """
     rng = np.random.default_rng(seed)
     out = []
@@ -116,7 +116,7 @@ def per_trajectory_null(df: pd.DataFrame, col: str, *, n_perm: int = 20, seed: i
     so the two distributions are directly comparable. Replicates are pooled rather than averaged
     within a trajectory: averaging would shrink the null's width by sqrt(n_perm) and make the
     observed shift look larger than it is. The figure divides the counts by n_perm to put the
-    pooled null on the same vertical scale as the 433 observed points.
+    pooled null on the same vertical scale as the 427 observed points.
     """
     rng = np.random.default_rng(seed)
     groups = [(g[col].to_numpy(), g["is_error"].to_numpy()) for _, g in df.groupby("trajectory_id")]

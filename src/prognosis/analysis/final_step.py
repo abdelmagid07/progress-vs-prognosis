@@ -28,7 +28,7 @@ def _proj_col(df: pd.DataFrame) -> str:
 
 
 def final_step_rows(df: pd.DataFrame, *, token_type: str = "reasoning") -> pd.DataFrame:
-    """One row per trajectory: its last step (legacy token_type-aware)."""
+    """One row per trajectory: its last step (tolerant of the older token_type schema)."""
     work = df.copy()
     if "token_type" in work.columns:
         work = work[work["token_type"] == token_type]

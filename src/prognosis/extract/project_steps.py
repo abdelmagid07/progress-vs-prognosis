@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Replay SWE-agent trajectories through Qwen3-8B and extract value-axis projections.
+"""Replay agent trajectories through the model and extract value-axis projections.
 
 Reproduce: python -m prognosis.extract.project_steps
 """
@@ -107,7 +107,7 @@ def assert_render_fidelity(full_text: str, assistant_message: dict) -> None:
     generated token stream from the split ``reasoning_content`` / ``tool_calls``
     fields. If a template version drops the ``<think>`` block or mangles the tool
     call, the activation we read no longer matches what the model computed, so we
-    fail loudly (the thinking-ON analogue of the old thinking-off guard). Run once
+    fail loudly (the thinking-ON analogue of the thinking-off guard). Run once
     per projection on the first structured turn.
     """
     segment = _final_assistant_segment(full_text)
@@ -258,8 +258,8 @@ class ActivationSink:
         """Resume from a previously written activations dump.
 
         Prefer local disk over a FUSE-mounted mirror: a multi-GB ``np.load`` over
-        FUSE can hang for tens of minutes with no output. Prints progress so a
-        notebook front-end does not look frozen.
+        FUSE can hang for tens of minutes with no output. Prints progress so the
+        caller does not appear frozen.
         """
         path = Path(path)
         print(f"Loading activations from {path} ...", flush=True)
@@ -623,7 +623,7 @@ def main():
     ap.add_argument(
         "--output",
         type=Path,
-        default=data_file("projections.parquet"),
+        default=data_file("projections_full.parquet"),
     )
     ap.add_argument(
         "--layers",

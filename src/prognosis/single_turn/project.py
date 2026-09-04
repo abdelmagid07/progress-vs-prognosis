@@ -10,7 +10,7 @@ Three readouts, in increasing faithfulness to the original paper:
 - ``mean``/``final`` (whole code span): mean over every code token, or just
   the last one. Ours; the whole-span mean turned out to be diluted by a
   positional ramp unrelated to correctness (confirmed via a random-direction
-  control — see project notes), so this is *not* a faithful reproduction of
+  control), so this is *not* a faithful reproduction of
   the original paper's headline stat.
 - ``window`` (``diff_window_mask`` + masked mean): the original paper's actual
   metric — "the average value-axis projection on the assistant tokens after

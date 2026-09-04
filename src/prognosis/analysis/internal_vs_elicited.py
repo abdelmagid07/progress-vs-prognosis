@@ -97,9 +97,9 @@ def run(
 def main() -> None:
     defaults = load_defaults()
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--projections", type=Path, default=data_file("projections.parquet"))
+    ap.add_argument("--projections", type=Path, default=data_file("projections_full.parquet"))
     ap.add_argument("--confidence", type=Path, default=data_file("confidence.parquet"))
-    ap.add_argument("--output-dir", type=Path, default=data_file("").parent)
+    ap.add_argument("--output-dir", type=Path, default=data_file(""))
     ap.add_argument("--n-bins", type=int, default=defaults["n_bins"])
     ap.add_argument(
         "--primary-layer",

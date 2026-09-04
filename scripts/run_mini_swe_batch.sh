@@ -21,7 +21,7 @@
 #                    azure: https://<resource>.services.ai.azure.com/openai/v1
 #   MODEL_API_KEY    API key (default: EMPTY for local vLLM)
 #   MODEL_NAME       litellm model id
-#                    vllm:  hosted_vllm/Qwen3-8B  (or Qwen3-32B if you self-host)
+#                    vllm:  hosted_vllm/Qwen3-32B (the model the paper reports)
 #                    azure: openai/<deployment>   e.g. openai/qwen3-32b
 #   SUBSET           SWE-bench subset: verified | lite | <dataset path> (default: verified)
 #   SPLIT            dataset split (default: test)
@@ -60,7 +60,7 @@ MODEL_API_KEY="${MODEL_API_KEY:-EMPTY}"
 if [[ "$MODEL_PROVIDER" == "azure" ]]; then
   MODEL_NAME="${MODEL_NAME:-openai/qwen3-32b}"
 else
-  MODEL_NAME="${MODEL_NAME:-hosted_vllm/Qwen3-8B}"
+  MODEL_NAME="${MODEL_NAME:-hosted_vllm/Qwen3-32B}"
 fi
 SUBSET="${SUBSET:-verified}"
 SPLIT="${SPLIT:-test}"

@@ -1,10 +1,10 @@
 """AUROC of the value-axis readout by relative-position bin (with task-level CI).
 
 The paper reports the separation "at every relative position", not just the
-final step. This replaces the old SNR-by-position *headline* with AUROC per
-equal-width ``rel_pos`` bin, each with a task-level BCa confidence interval and
-the pre-registered signal flag (CI excludes 0.5). SNR-by-position is retained as
-a secondary diagnostic in :mod:`prognosis.analysis.signal_to_noise`.
+final step. The headline is AUROC per equal-width ``rel_pos`` bin, each with a
+task-level BCa confidence interval and the pre-registered signal flag (CI excludes
+0.5). SNR-by-position is a secondary diagnostic in
+:mod:`prognosis.analysis.signal_to_noise`.
 """
 
 from __future__ import annotations

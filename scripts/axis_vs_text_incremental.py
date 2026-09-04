@@ -45,7 +45,7 @@ from sklearn.preprocessing import StandardScaler
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from analyze_agentic import fast_auroc  # noqa: E402
-from text_only_baseline import GROUPS, METHOD_TRAJECTORY_FEATURES, featurise  # noqa: E402
+from text_only_baseline import GROUPS, PAPER_TRAJECTORY_FEATURES, featurise  # noqa: E402
 
 OUT_DIR = ROOT / "data"
 TEXT = sum(GROUPS.values(), [])
@@ -102,11 +102,11 @@ def main() -> None:
     print(f"\nR^2 of axis projection regressed on the eight text features: {r2:.3f}")
 
     # ---- incremental value -------------------------------------------------
-    # The four features METHOD names, and those four plus the axis. These are the arms the paper
+    # The four features the paper's method section names, and those four plus the axis. These are the arms the paper
     # reports, and they have to be measured under ONE protocol: text_only_baseline.py carries its
     # own cv_auroc, so quoting its number next to a combined number computed here would compare
     # two different cross-validations and manufacture a difference out of the harness.
-    Xm = df[METHOD_TRAJECTORY_FEATURES].to_numpy(float)
+    Xm = df[PAPER_TRAJECTORY_FEATURES].to_numpy(float)
 
     sets = {
         "text only":            Xt,

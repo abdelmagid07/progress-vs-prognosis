@@ -17,7 +17,7 @@ SWE-bench harness ``resolved`` / ``unresolved`` keys). A trajectory whose
 instance id is in neither list is skipped with a warning: the transfer test is
 supervised, so an unlabeled trajectory is unusable.
 
-Reproduce: python -m prognosis.agent.ingest_batch
+Reproduce: python -m prognosis.agent.ingest_batch --traj-dir data/trajectories/<run>
 """
 
 from __future__ import annotations

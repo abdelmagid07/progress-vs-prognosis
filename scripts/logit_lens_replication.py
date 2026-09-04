@@ -8,10 +8,10 @@ models differ in size and hidden dimension -- which makes this a cross-model rep
 rather than a sanity check.
 
 The statistic is RANK, not score. Score magnitudes are not comparable across models with
-different hidden sizes and unembedding norms, and an earlier version of this analysis went wrong
-by reaching for the score standard deviation: that measures alignment with the whole vocabulary,
-which no meaningful direction has, and it reported "indistinguishable from random" for a
-direction whose top-ranked token is the published rank 3.
+different hidden sizes and unembedding norms. The score standard deviation is the wrong
+statistic here: it measures alignment with the whole vocabulary, which no meaningful direction
+has, and it reports "indistinguishable from random" even for a direction whose top-ranked
+token is the published rank 3.
 
 The null is the same 30 tokens scored under random unit directions of matched dimensionality,
 which is what distinguishes a real replication from tokens that simply sit at the top of any

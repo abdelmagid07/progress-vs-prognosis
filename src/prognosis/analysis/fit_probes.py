@@ -15,7 +15,7 @@ Protocol:
     resolved trajectories.
   - Report the full layer × position-bin AUROC grid (never just the max).
 
-Reproduce: python -m prognosis.analysis.fit_probes
+Reproduce: python -m prognosis.analysis.fit_probes --activations data/full_meanpool.npz
 """
 
 from __future__ import annotations

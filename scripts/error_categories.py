@@ -17,8 +17,8 @@ over events rather than averaged per trajectory. Pooling is the right choice her
 question is about categories, not runs, and some categories are rare enough that a per-trajectory
 mean would be undefined for most trajectories.
 
-NO TEST-FAILURE CATEGORY. One was tried and removed: a test-runner signature appears in 4 of the
-12,464 steps, and an explicit FAILED line in one. This agent almost never executes the test suite,
+NO TEST-FAILURE CATEGORY. One was tried and removed: a test-runner signature appears in 7 of the
+12,464 steps. This agent almost never executes the test suite,
 so failing tests are not an error category here -- "error" in this setting means a command or
 script that did not run, not a test that did not pass. The counter is kept in the output so the
 claim is checkable rather than asserted.

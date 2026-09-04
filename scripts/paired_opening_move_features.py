@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """What property of the agent's opening move carries the prefix-probe signal?
 
-The prefix-restricted probe (``paired_direction_control.py``) ranks the resolved arm above
+The prefix-restricted probe (the k=1 readout below) ranks the resolved arm above
 the unresolved arm in 37 of 50 pairs using ONLY step 0 -- before the agent has done anything
 but read the prompt and issue one command. The single-turn control shows this same axis
 family responds strongly to whole-text rewrites (~0.75 AUROC) but barely to small semantic
@@ -14,12 +14,13 @@ This script tests that reading directly and cheaply, with no new GPU work:
    C=0.1), but keeps each held-out trajectory's decision-function SCORE instead of collapsing
    to a correct/incorrect bit. That gives a continuous per-pair margin
    (resolved score - unresolved score) instead of just its sign.
-2. Parses step 0 of every trajectory in the paired-run bundle into five
-   text features: opening-response length, thought length, first-command length, hedging-
-   language count, and whether the first command modifies the repo (write) or only reads it.
+2. Parses step 0 of every trajectory in the paired-run bundle into seven
+   text features: opening-response length, reasoning length, thought length, first-command
+   length, number of chained commands, hedging-language count, and whether the first command
+   modifies the repo (write) or only reads it.
 3. Correlates the per-pair margin against the per-pair feature DIFFERENCE (resolved -
    unresolved), and separately fits a probe on the text features ALONE (same leave-one-pair-
-   out procedure) to see how much of the 37/50 result these five surface features can
+   out procedure) to see how much of the 37/50 result these seven surface features can
    reconstruct on their own.
 
 CAVEATS. correlations below are exploratory, not confirmatory -- nothing here is
@@ -242,7 +243,7 @@ def main() -> None:
             "strongly with the activation-probe margin, the k=1 signal is substantially "
             "stylistic (consistent with the single-turn control's sensitivity to whole-text "
             "rewrites). If it stays near chance despite the activation probe scoring well, "
-            "the five surface features tested here do not explain the signal and a semantic "
+            "the seven surface features tested here do not explain the signal and a semantic "
             "(content-based) reading is favoured. Either way, this is "
             "suggestive, not confirmatory."
         ),

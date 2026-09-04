@@ -3,7 +3,7 @@
 
 The paper establishes that outcome information is linearly decodable within a task while the
 frozen axis does not capture it. That leaves three things unmeasured, all of which a reviewer
-can reasonably ask about given 34 training points in 5120 dimensions:
+can reasonably ask about given 98 training points in 5120 dimensions:
 
   1. STABILITY. Is there one shared outcome direction, or is each pair separable for its own
      idiosyncratic reasons? Tested by splitting the pairs into DISJOINT halves, fitting a
@@ -22,7 +22,7 @@ can reasonably ask about given 34 training points in 5120 dimensions:
      the confound is a property of pooled training rather than of this particular axis.
 
      (The direct version of 3 -- fitting a probe on the 499 pooled trajectories -- needs the
-     full-run activation cache, which is not in the repository; only the 36 paired trajectories
+     full-run activation cache, which is not in the repository; only the 100 paired trajectories
      are stored. This subspace decomposition asks the same question from the data we have.)
 
 GEOMETRY NOTE. The probe is fit on standardised features, so its weight vector lives in
@@ -175,10 +175,8 @@ def main() -> None:
             "direction is not what a pooled, task-recognising probe would learn."
         ),
     }
-    # sweep_layers was defined but never called: the key it produces was present in a stored
-    # JSON from an older revision and silently disappeared the next time this script ran, taking
-    # the per-layer alignment data with it. Wired in here so the artifact is reproducible from
-    # the script that claims to write it.
+    # Called here so the per-layer alignment key this script documents is always present in
+    # the artifact it writes.
     out["alignment_layer_sweep"] = sweep_layers(args.activations, args.axis, args.C)
 
     path = OUT_DIR / "paired_direction_geometry.json"

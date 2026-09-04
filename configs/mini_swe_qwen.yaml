@@ -20,7 +20,7 @@ environment:
 
 model:
   # Placeholder; overwritten by MODEL_NAME at resolve time.
-  model_name: hosted_vllm/Qwen3-8B
+  model_name: hosted_vllm/Qwen3-32B
   model_kwargs:
     api_base: http://localhost:8000/v1   # placeholder; set MODEL_API_BASE
     api_key: EMPTY                        # placeholder; set MODEL_API_KEY

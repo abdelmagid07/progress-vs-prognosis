@@ -2,7 +2,7 @@
 """Does within-task outcome decoding survive removing the frozen value axis from the activations?
 
 paired_direction_geometry.py answers this geometrically: the fitted outcome direction and the
-frozen axis are at 89.9 degrees at layer 53, |cos| = 0.0016. That implies removing the axis should
+frozen axis are at 89.7 degrees at layer 53, |cos| = 0.0049. That implies removing the axis should
 cost the probe nothing, but it states the result as an angle between two vectors, which is a claim
 about directions rather than about decoding. This script makes the same point directly: delete the
 axis component from every activation and refit the identical leave-one-pair-out probe.

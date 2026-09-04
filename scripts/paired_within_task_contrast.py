@@ -10,7 +10,7 @@ Implements the experimental-setup spec for the paired sub-study:
 
 WHY THIS DESIGN ANSWERS SOMETHING THE 500-TASK RUN CANNOT. On the full benchmark the
 axis separates outcomes, but three confounds fire (see
-data/agentic_confound_checks.json): trajectory length alone
+data/confound_cascade.json): trajectory length alone
 out-predicts the axis, separation is already present at step 0 before the agent has
 acted, and the effect largely dissolves inside length strata. All are symptoms of the
 same alternative explanation -- the axis may be reading *static task difficulty* off
@@ -118,7 +118,7 @@ def paired_tests(diffs: np.ndarray) -> dict:
     # Wilcoxon needs at least one non-zero difference.
     nz = diffs[diffs != 0]
     if len(nz) >= 1:
-        # Exact method when small and untied, which is the case at n=20.
+        # Exact method when small and untied, which is the case at n=50.
         stat, p = wilcoxon(nz, alternative="two-sided",
                            mode="exact" if len(nz) <= 25 else "auto")
         res["wilcoxon_stat"] = float(stat)

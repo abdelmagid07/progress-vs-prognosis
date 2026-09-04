@@ -276,8 +276,7 @@ def main() -> None:
     #                     average ~2 steps and unresolved ~5.6, so the two classes get
     #                     systematically different amounts of smoothing and the
     #                     comparison is confounded by length rather than position.
-    #                     Retained only because it is what the old-axis pipeline
-    #                     reported, so the two are comparable.
+    #                     Retained for comparability with previously reported values.
     #   auroc_midstep  -- the single step nearest the bin's midpoint, one row per
     #                     trajectory per bin. Position-matched with no differential
     #                     averaging, so this is the one to trust.
@@ -352,7 +351,7 @@ def main() -> None:
         "resolution_rate": resolution_rate,
         "majority_baseline": float(max(resolution_rate, 1 - resolution_rate)),
         "layer_range": [int(df["layer"].min()), int(df["layer"].max())],
-        "layer_indexing": "new-axis, embedding-inclusive; layer 0 unavailable from cache",
+        "layer_indexing": "axis-row numbering, embedding-inclusive; layer 0 unavailable from cache",
         "final_step": {
             "peak_layer_post_hoc": peak_layer,
             "auroc": float(peak["auroc"]),
@@ -378,7 +377,7 @@ def main() -> None:
             "'no early separation' pattern (bin 0: 0.52 binmean vs 0.72 midstep).",
             "Separation is present from step 0 onward, before the agent has meaningfully "
             "acted, which is consistent with the axis reading static task difficulty off the "
-            "prompt rather than tracking trajectory progress. See agentic_confound_checks.json.",
+            "prompt rather than tracking trajectory progress. See confound_cascade.json.",
             "proj_mean here is cosine-of-meanvec (from the cached mean-pooled activations), "
             "not the original per-token mean-of-cosines.",
             "proj_final (single-final-token readout) is not recoverable from the cache.",

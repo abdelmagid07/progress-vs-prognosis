@@ -61,7 +61,7 @@ def run_analyses(
     output_dir: Path | None = None,
     primary_layer: int | None = None,
 ) -> dict:
-    output_dir = output_dir or data_file("").parent
+    output_dir = output_dir or data_file("")
     output_dir.mkdir(parents=True, exist_ok=True)
     df = pd.read_parquet(projections_path)
 
@@ -149,9 +149,9 @@ def run_analyses(
 def main():
     defaults = load_defaults()
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--projections", type=Path, default=data_file("projections.parquet"))
+    ap.add_argument("--projections", type=Path, default=data_file("projections_full.parquet"))
     ap.add_argument("--n-bins", type=int, default=defaults["n_bins"])
-    ap.add_argument("--output-dir", type=Path, default=data_file("").parent)
+    ap.add_argument("--output-dir", type=Path, default=data_file(""))
     ap.add_argument(
         "--primary-layer",
         type=int,

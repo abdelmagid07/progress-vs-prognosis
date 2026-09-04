@@ -23,11 +23,11 @@ def stream_scores(shard: Path, key: str, directions: dict[str, np.ndarray],
                   block_rows: int = 8192) -> tuple[dict[str, np.ndarray], np.ndarray]:
     """Compute W @ d for each direction, and each row's norm, without loading W.
 
-    This machine has ~1.5 GB of free RAM against a 1.56 GB unembedding, so neither
+    The unembedding is ~1.56 GB, so on a host without that much free RAM neither
     safetensors.load_file (which loads every tensor in the shard) nor safe_open (which
-    memory-maps the whole file) can be used -- both raise a Windows paging-file error. The lens
-    only ever needs W @ d, which is a streaming reduction: read a block of vocabulary rows,
-    accumulate, discard. Peak memory is one block, about 170 MB at the default size.
+    memory-maps the whole file) is usable. The lens only ever needs W @ d, which is a
+    streaming reduction: read a block of vocabulary rows, accumulate, discard. Peak memory
+    is one block, about 170 MB at the default size.
     """
     hdr, data_start = _st_header(shard)
     if key not in hdr:

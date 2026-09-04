@@ -20,7 +20,7 @@ If the residualised probe holds up, (a) is favoured and the paper's claim surviv
 collapses to the length-only floor, (b) is favoured and the honest statement is that the early
 signal is verbosity.
 
-LEAKAGE. The length->activation regression is fit INSIDE each fold, on the 34 training
+LEAKAGE. The length->activation regression is fit INSIDE each fold, on the 98 training
 trajectories only, and then applied to the held-out pair. Residualising globally before the
 split would let the held-out pair's own length inform its features, which is the same class of
 error as tuning C on the evaluation set.
@@ -112,7 +112,7 @@ def covariates(meta: pd.DataFrame,
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--activations", type=Path, default=ROOT / "data" / "pairs50_meanpool.npz")
-    ap.add_argument("--layer", type=int, default=53, help="new-axis layer for the headline cell")
+    ap.add_argument("--layer", type=int, default=53, help="axis-row layer for the headline cell")
     ap.add_argument("--C", type=float, default=0.1)
     ap.add_argument("--sweep", action="store_true", help="also sweep all 64 layers")
     ap.add_argument("--projections", type=Path,

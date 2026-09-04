@@ -2,9 +2,8 @@
 
 Reimplemented from the original paper's description of the four corruption
 categories ("Correlation with code correctness") — the original
-`code_utils.py` this mirrors is not present in the reference snapshot
-in the released reference code, so this reproduces the
-same four categories, not a byte-identical replication of the paper's code.
+`code_utils.py` this mirrors is not present in the released reference code, so
+this reproduces the same four categories, not a byte-identical replication of it.
 Each function is seeded (matching the reference script's
 ``hashlib.md5(slug)`` convention) so a given problem always corrupts the same
 way.

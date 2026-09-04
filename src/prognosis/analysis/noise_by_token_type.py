@@ -1,9 +1,9 @@
 """Analysis 3: readout noise — mean-over-G_t vs single final token.
 
-The paper excludes tool-output tokens from the readout, so the old
-reasoning-vs-tool_output comparison retires. This repoints the same diagnostic
-at the two readouts we now compute: ``proj_mean`` (Eq. 1, mean cosine over the
-generated tokens) vs ``proj_final`` (the single final-token robustness read).
+The paper excludes tool-output tokens from the readout, so this diagnostic
+compares the two readouts actually computed: ``proj_mean`` (Eq. 1, mean cosine
+over the generated tokens) vs ``proj_final`` (the single final-token robustness
+read).
 The expectation is that averaging reduces variance, i.e. ``proj_mean`` is the
 less noisy readout.
 """

@@ -9,8 +9,8 @@ import pandas as pd
 def _proj_col(df: pd.DataFrame) -> str:
     """The primary readout column: mean cosine over G_t (Eq. 1).
 
-    Falls back to the legacy single-value ``projection`` column so pre-migration
-    parquets still analyze.
+    Falls back to a single-value ``projection`` column so tables written under the
+    older schema still analyze.
     """
     return "proj_mean" if "proj_mean" in df.columns else "projection"
 

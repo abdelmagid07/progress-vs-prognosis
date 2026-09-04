@@ -12,7 +12,8 @@ on CPU with no further GPU passes.
 
 Usage: python -m prognosis.axis.token_level_auroc --projections ... --meta ... --out ...
 
-Reproduce: python -m prognosis.axis.token_level_auroc
+Reproduce: python -m prognosis.axis.token_level_auroc --projections data/token_projections.npz
+  --meta data/token_projections_meta.json --out data/token_level_heldout_auroc_by_layer.csv
 """
 
 import argparse

@@ -11,6 +11,8 @@ a split is a linear combination of those means, every split is scored from the t
 on CPU with no further GPU passes.
 
 Usage: python -m prognosis.axis.token_level_auroc --projections ... --meta ... --out ...
+
+Reproduce: python -m prognosis.axis.token_level_auroc
 """
 
 import argparse

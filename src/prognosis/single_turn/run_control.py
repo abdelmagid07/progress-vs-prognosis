@@ -4,6 +4,8 @@
 Resumable checkpoint loop at the granularity of one DebugBench problem
 (slug): all of a slug's rows, the original plus every corrupted variant, are
 computed and checkpointed together, so a checkpoint is always slug-atomic.
+
+Reproduce: python -m prognosis.single_turn.run_control
 """
 
 import argparse

@@ -2,7 +2,7 @@
 """What property of the agent's opening move carries the prefix-probe signal?
 
 The prefix-restricted probe (``paired_direction_control.py``) ranks the resolved arm above
-the unresolved arm in 16 of 18 pairs using ONLY step 0 -- before the agent has done anything
+the unresolved arm in 37 of 50 pairs using ONLY step 0 -- before the agent has done anything
 but read the prompt and issue one command. The single-turn control shows this same axis
 family responds strongly to whole-text rewrites (~0.75 AUROC) but barely to small semantic
 breaks (~0.53), which suggests a stylistic reading: maybe the probe is picking up surface
@@ -14,15 +14,15 @@ This script tests that reading directly and cheaply, with no new GPU work:
    C=0.1), but keeps each held-out trajectory's decision-function SCORE instead of collapsing
    to a correct/incorrect bit. That gives a continuous per-pair margin
    (resolved score - unresolved score) instead of just its sign.
-2. Parses step 0 of all 36 trajectories from ``normalized_mixed_within_task.zip`` into five
+2. Parses step 0 of every trajectory in the paired-run bundle into five
    text features: opening-response length, thought length, first-command length, hedging-
    language count, and whether the first command modifies the repo (write) or only reads it.
 3. Correlates the per-pair margin against the per-pair feature DIFFERENCE (resolved -
    unresolved), and separately fits a probe on the text features ALONE (same leave-one-pair-
-   out procedure) to see how much of the 16/18 result these five surface features can
+   out procedure) to see how much of the 37/50 result these five surface features can
    reconstruct on their own.
 
-CAVEATS. n=18 pairs: correlations below are exploratory, not confirmatory -- nothing here is
+CAVEATS. correlations below are exploratory, not confirmatory -- nothing here is
 powered to publish on its own. The write-vs-read command classification is a regex heuristic
 over bash commands, not a parser; spot-check ``is_modifying`` before trusting it.
 
@@ -163,7 +163,7 @@ FEATURE_COLS = ["resp_len_words", "reasoning_len_words", "thought_len_words",
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "paired_meanpool.npz")
+    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "pairs50_meanpool.npz")
     ap.add_argument("--trajectories", type=Path,
                      default=ROOT / "data" / "normalized_pairs.zip")
     ap.add_argument("--layer-new-axis", type=int, default=53)
@@ -171,7 +171,7 @@ def main() -> None:
     args = ap.parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # --- 1. held-out margin from the SAME k=1 probe as the paper's 16/18 result -----------
+    # --- 1. held-out margin from the SAME k=1 probe as the reported step-0 result --------
     block = args.layer_new_axis - 1
     acts, m = load(args.activations, block)
     V, info = traj_vectors(acts, m, max_steps=1)
@@ -181,7 +181,7 @@ def main() -> None:
                      > scored.pivot_table(index="task_id", columns="outcome",
                                           values="score")[0]).sum())
     print(f"sanity check: k=1 probe margin agrees with sign result on "
-          f"{n_correct}/{scored['task_id'].nunique()} pairs (paper reports 16/18)")
+          f"{n_correct}/{scored['task_id'].nunique()} pairs")
 
     # --- 2. step-0 text features -----------------------------------------------------------
     feats = load_features(args.trajectories)
@@ -238,12 +238,12 @@ def main() -> None:
         "text_features_only_probe_k1": text_probe,
         "feature_vs_margin_correlations": corr_df.to_dict(orient="records"),
         "interpretation": (
-            "If the text-only probe approaches 16/18 and/or individual features correlate "
+            "If the text-only probe approaches the activation probe and/or individual features correlate "
             "strongly with the activation-probe margin, the k=1 signal is substantially "
             "stylistic (consistent with the single-turn control's sensitivity to whole-text "
             "rewrites). If it stays near chance despite the activation probe scoring well, "
             "the five surface features tested here do not explain the signal and a semantic "
-            "(content-based) reading is favoured. Either way, n=18 pairs means this is "
+            "(content-based) reading is favoured. Either way, this is "
             "suggestive, not confirmatory."
         ),
     }

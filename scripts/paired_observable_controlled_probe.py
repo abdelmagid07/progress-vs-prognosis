@@ -11,10 +11,9 @@ activations at once and refits the identical leave-one-pair-out probe. If the pr
 after every measurable surface property is removed simultaneously, "it is really reading
 verbosity/hedging/command style" stops being available as an explanation.
 
-WHY THIS MATTERS MORE AT 50 PAIRS THAN AT 18. In the original 18-pair set trajectory length was
-balanced within pairs by luck (length AUROC 0.554, against 0.780 on the full 499-task run). In
-the 50-pair set it is not: the resolved arm is shorter in 31 of 50 pairs and length reaches AUROC
-0.682, close to the full-benchmark value. Length is therefore a live confound in this set rather
+WHY THIS MATTERS. Within these pairs trajectory length is not balanced: the resolved arm is
+shorter in 31 of 50 pairs and length reaches AUROC 0.682, close to the 0.780 it reaches on
+the full run. Length is therefore a live confound in this set rather
 than a hypothetical one, and a control that removes it -- along with everything else observable --
 is doing real work.
 
@@ -148,15 +147,15 @@ def loo_rank(X, meta, Z, C, mode):
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    # The 50-pair activations, not the 18-pair file the earlier controls defaulted to. Those two
-    # differ only by name, so pointing at the wrong one produces a complete, plausible, silently
-    # obsolete result rather than an error.
+    # The activations and the projections table must describe the same trajectories: a
+    # mismatch produces a complete, plausible, silently wrong result rather than an
+    # error.
     ap.add_argument("--activations", type=Path, default=ROOT / "data" / "pairs50_meanpool.npz")
     ap.add_argument("--projections", type=Path,
                     default=ROOT / "data" / "projections_pairs50.parquet")
     ap.add_argument("--layer", type=int, default=53, help="new-axis layer for the headline cell")
     ap.add_argument("--C", type=float, default=0.1)
-    ap.add_argument("--step0-covariates", action="store_true",
+    ap.add_argument("--step0-covariates", action=argparse.BooleanOptionalAction, default=True,
                     help="restrict the first-step readout to the seven step-0 features")
     ap.add_argument("--drop-one", action="store_true",
                     help="also report each covariate removed on its own, to see which matters")

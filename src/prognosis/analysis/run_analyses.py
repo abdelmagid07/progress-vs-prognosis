@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-"""Run trajectory readability analyses and write report."""
+"""Run trajectory readability analyses and write report.
+
+Reproduce: python -m prognosis.analysis.run_analyses
+"""
 
 from __future__ import annotations
 

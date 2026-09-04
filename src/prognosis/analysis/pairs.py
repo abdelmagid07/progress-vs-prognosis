@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy.stats import binomtest
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 

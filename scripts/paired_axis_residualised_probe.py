@@ -11,7 +11,7 @@ Three arms on the same folds:
 
   raw                the probe as reported in the paper
   axis-residualised  activations with their component along v^(l) projected out
-  axis only          the frozen axis score alone, as the floor -- this is the paper's 4/18
+  axis only          the frozen axis score alone, as the floor -- the reported 22/50
 
 NO LEAKAGE CONCERN, unlike the length control. The length residualisation in
 paired_length_controlled_probe.py must be fitted inside each fold because the length->activation
@@ -79,12 +79,13 @@ def loo_rank(X, meta, C):
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "paired_meanpool.npz")
+    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "pairs50_meanpool.npz")
     ap.add_argument("--axis", type=Path,
                     default=ROOT / "data" / "value_axis.npy")
     ap.add_argument("--layer", type=int, default=53)
     ap.add_argument("--C", type=float, default=0.1)
-    ap.add_argument("--sweep", action="store_true")
+    ap.add_argument("--sweep", action=argparse.BooleanOptionalAction, default=True,
+                    help="report the full layer sweep alongside the headline layer")
     args = ap.parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -126,8 +127,9 @@ def main() -> None:
         out["sweep_summary"] = {"raw_median": float(np.median(raw)),
                                 "residualised_median": float(np.median(dfl)),
                                 "layers_where_residualised_lower": int((dfl < raw).sum())}
-        print(f"\nsweep: raw median {np.median(raw):.0f}/18, "
-              f"residualised median {np.median(dfl):.0f}/18, "
+        n_pairs = res["raw"]["n_pairs"]
+        print(f"\nsweep: raw median {np.median(raw):.0f}/{n_pairs}, "
+              f"residualised median {np.median(dfl):.0f}/{n_pairs}, "
               f"lower in {(dfl < raw).sum()} of 64 layers")
 
     path = OUT_DIR / "paired_axis_residualised_probe.json"

@@ -141,9 +141,9 @@ def paired_tests(diffs: np.ndarray) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--projections", type=Path,
-                    default=ROOT / "data" / "projections_paired.parquet")
+                    default=ROOT / "data" / "projections_pairs50.parquet")
     ap.add_argument("--readout", choices=sorted(READOUTS), default="final")
-    ap.add_argument("--layer", type=int, default=None,
+    ap.add_argument("--layer", type=int, default=53,
                     help="Layer to report as the headline. Default: the layer with the "
                          "smallest Wilcoxon p across the sweep, which is POST-HOC and "
                          "labelled as such in the output.")

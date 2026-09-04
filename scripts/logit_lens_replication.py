@@ -55,7 +55,7 @@ def main() -> None:
     ap.add_argument("--axis", type=Path,
                     default=ROOT / "data" / "value_axis.npy")
     ap.add_argument("--tokenizer", default="Qwen/Qwen3-32B")
-    ap.add_argument("--layers", type=int, nargs="+", default=list(range(20, 65, 4)))
+    ap.add_argument("--layers", type=int, nargs="+", default=list(range(65)))
     ap.add_argument("--n-random", type=int, default=20)
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")

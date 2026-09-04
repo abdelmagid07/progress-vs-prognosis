@@ -3,7 +3,7 @@
 
 The opening-move analysis (paired_opening_move_features.py) showed that a probe built from
 seven surface text features -- dominated by how long the agent reasons before acting -- matches
-the activation probe's 16/18 at k=1. That is consistent with two very different readings:
+the activation probe's 37/50 at k=1. That is consistent with two very different readings:
 
   (a) the activations carry outcome information, and length is merely one visible correlate
       of it, or
@@ -93,12 +93,11 @@ def covariates(meta: pd.DataFrame,
                projections: Path | None = None) -> dict[str, np.ndarray]:
     """Length covariates aligned to meta's row order, one value per trajectory.
 
-    ``projections`` must describe the SAME trajectories as the activations. It was hardcoded to
-    the 18-pair file, which made the 50-pair run fail on a missing-covariate assertion rather
-    than silently mismatch, but the fix is to pass the matching projections explicitly.
+    ``projections`` must describe the SAME trajectories as the activations. A mismatch trips
+    the missing-covariate assertion below rather than silently producing wrong numbers.
     """
     feats = pd.read_csv(OUT_DIR / "paired_opening_move_features.csv")
-    proj = pd.read_parquet(projections or ROOT / "data" / "projections_paired.parquet")
+    proj = pd.read_parquet(projections or ROOT / "data" / "projections_pairs50.parquet")
     tok = (proj[proj.layer == proj.layer.min()]
            .groupby("trajectory_id", as_index=False).n_gen_tokens.sum())
     key = meta["trajectory_id"]
@@ -112,12 +111,13 @@ def covariates(meta: pd.DataFrame,
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "paired_meanpool.npz")
+    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "pairs50_meanpool.npz")
     ap.add_argument("--layer", type=int, default=53, help="new-axis layer for the headline cell")
     ap.add_argument("--C", type=float, default=0.1)
     ap.add_argument("--sweep", action="store_true", help="also sweep all 64 layers")
-    ap.add_argument("--projections", type=Path, default=None,
-                    help="projections parquet matching --activations; defaults to the 18-pair file")
+    ap.add_argument("--projections", type=Path,
+                    default=ROOT / "data" / "projections_pairs50.parquet",
+                    help="projections parquet matching --activations")
     args = ap.parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     block = args.layer - 1

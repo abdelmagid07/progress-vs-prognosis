@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-"""Replay SWE-agent trajectories through Qwen3-8B and extract value-axis projections."""
+"""Replay SWE-agent trajectories through Qwen3-8B and extract value-axis projections.
+
+Reproduce: python -m prognosis.extract.project_steps
+"""
 
 from __future__ import annotations
 

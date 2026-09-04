@@ -7,7 +7,7 @@ Every headline number in the results section is the SAME estimand:
 
 Pooled AUROC is exactly that probability with no conditioning (AUROC = P(X_pos > X_neg) +
 0.5 P(tie)). The within-task result is the same probability conditioned on the two runs sharing
-a task, which is what a paired sign count over 18 pairs estimates. The length-stratified result
+a task, which is what a paired sign count over the 50 pairs estimates. The length-stratified result
 conditions on the two runs sharing a length quartile. So all five rows below can share one axis
 with chance at 0.5 -- they are not different metrics that happen to be plotted together, and
 the figure would be misleading if they were.
@@ -17,12 +17,12 @@ Reading down the rows, the apparent transfer is progressively removed by conditi
     all pairs, final step          0.747   the headline
     all pairs, at step 0           0.723   present before the agent acts
     same length stratum            ~0.60   most of it was length
-    same task, final step          10/18   nothing left
-    same task, trajectory mean      4/18   reverses
+    same task, final step          31/50   nothing left
+    same task, trajectory mean      22/50  at chance
 
 Intervals: BCa bootstrap over trajectories for the two unconditioned rows and the stratified
 row (matching the rest of the paper); Wilson score intervals for the two paired rows, since
-those are binomial counts over 18 pairs, not bootstrapped statistics.
+those are binomial counts over 50 pairs, not bootstrapped statistics.
 
 Writes data/confound_cascade.json.
 
@@ -88,7 +88,7 @@ def bca(stat_fn, n: int, observed: float, *, n_boot: int, seed: int,
 
 
 def wilson(k: int, n: int, alpha: float = ALPHA) -> tuple[float, float]:
-    """Wilson score interval -- the right one for 4/18, where normal approximation fails."""
+    """Wilson score interval -- the right one for small binomial counts."""
     z = norm.ppf(1 - alpha / 2)
     p, d = k / n, 1 + z**2 / n
     centre = (p + z**2 / (2 * n)) / d
@@ -99,18 +99,18 @@ def wilson(k: int, n: int, alpha: float = ALPHA) -> tuple[float, float]:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--projections", type=Path, default=ROOT / "data" / "projections_full.parquet")
-    ap.add_argument("--paired", type=Path, default=ROOT / "data" / "projections_paired.parquet")
+    ap.add_argument("--paired", type=Path, default=ROOT / "data" / "projections_pairs50.parquet")
     ap.add_argument("--layer", type=int, default=53)
     ap.add_argument("--n-boot", type=int, default=2000)
     ap.add_argument("--confidence-paired", type=Path,
-                    default=ROOT / "data" / "confidence_paired.parquet")
+                    default=ROOT / "data" / "confidence_pairs50.parquet")
     ap.add_argument("--probe-csv", type=Path,
                     default=OUT_DIR / "paired_probe_ceiling.csv")
     ap.add_argument("--probe-C", type=float, default=0.1,
                     help="Regularisation for the reference probe row. Default 0.1 matches the "
                          "prefix-probe analysis. NOTE this is a swept parameter, not a "
-                         "pre-specified one: at layer 53 the probe scores 18/18 at C<=0.01 and "
-                         "17/18 at C>=0.1, so quoting the best C would be selection.")
+                         "pre-specified one: at layer 53 the probe scores 44/50 at C=0.01 and "
+                         "42/50 at C=1.0, so quoting the best C would be selection.")
     args = ap.parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -173,7 +173,7 @@ def main() -> None:
     piv_m = pm.pivot_table(index="task_id", columns="outcome", values="proj_mean").dropna()
     k_mean = int((piv_m[1] > piv_m[0]).sum())
 
-    # --- reference row: a probe FIT in-domain, same 18 pairs -----------------
+    # --- reference row: a probe FIT in-domain, same 50 pairs -----------------
     # Not part of the cascade: this row varies the METHOD, not the conditioning, so it is drawn
     # below a divider. It is here because the cascade alone invites "there was never anything to
     # detect" -- this row shows the information is near ceiling exactly where the frozen axis
@@ -194,10 +194,10 @@ def main() -> None:
     #
     # SUBLABELS carry one kind of thing only: the evidence base. They previously mixed editorial
     # commentary ("the headline result"), a method detail ("length quartiles") and sign counts
-    # ("10/18 pairs") in one column, which read as noise. The commentary belongs in the caption,
+    # (a bare "n/50") in one column, which read as noise. The commentary belongs in the caption,
     # The paired rows also carry their sign count in parentheses. That is the same number as
-# theta, but printing "4/18" alongside "0.222" shows what the decimal hides: the estimate is
-# a count over eighteen pairs, so it moves in steps of 0.056 and cannot be read as a
+# theta, but printing "22/50" alongside "0.440" shows what the decimal hides: the estimate is
+# a count over fifty pairs, so it moves in steps of 0.02 and cannot be read as a
 # continuous quantity measured to three digits.
     rows = [
         {"key": "pooled_final", "label": "Across tasks, final step",
@@ -221,7 +221,7 @@ def main() -> None:
     ]
 
     # ---- within-pair comparison of the three signals ------------------------
-    # Same 18 pairs, same evaluation (does the resolved arm rank above the unresolved one?),
+    # Same 50 pairs, same evaluation (does the resolved arm rank above the unresolved one?),
     # three different signals. Reported with the EXACT SIGN TEST for all three rather than the
     # Wilcoxon used elsewhere for the continuous ones: the bar is a count of pairs, so the
     # comparable test is the one on counts. This is the figure that answers "the agent is just

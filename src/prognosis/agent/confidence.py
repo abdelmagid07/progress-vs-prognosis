@@ -7,6 +7,8 @@ number in ``[0, 1]``. Eliciting post hoc rather than inline keeps the
 trajectories under study uncontaminated.
 
 Writes ``confidence.parquet`` keyed by ``trajectory_id``, ``step_index``.
+
+Reproduce: python -m prognosis.agent.confidence
 """
 
 from __future__ import annotations

@@ -4,6 +4,8 @@
 The paper Stage 4: both signals are scored against the same ground-truth
 outcomes at each relative position. Uses the same task-level BCa AUROC
 machinery as the transfer analyses.
+
+Reproduce: python -m prognosis.analysis.internal_vs_elicited
 """
 
 from __future__ import annotations

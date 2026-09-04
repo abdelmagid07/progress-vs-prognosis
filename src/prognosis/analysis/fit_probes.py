@@ -14,6 +14,8 @@ Protocol (The paper):
     fold; folds are stratified by task-level outcome mix so each fold contains
     resolved trajectories.
   - Report the full layer × position-bin AUROC grid (never just the max).
+
+Reproduce: python -m prognosis.analysis.fit_probes
 """
 
 from __future__ import annotations

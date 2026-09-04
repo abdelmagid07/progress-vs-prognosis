@@ -15,6 +15,8 @@ degenerate here because every problem's block is the identical fixed pair
 returned p=1.0 even on synthetic data with AUROC~1.0). See
 ``prognosis.single_turn.stats_local`` for the within-task label permutation
 used instead.
+
+Reproduce: python -m prognosis.single_turn.analyze
 """
 
 import argparse

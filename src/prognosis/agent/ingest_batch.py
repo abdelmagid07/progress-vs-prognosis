@@ -16,6 +16,8 @@ Labels come from ``results.json`` (``resolved_ids`` / ``unresolved_ids``, or the
 SWE-bench harness ``resolved`` / ``unresolved`` keys). A trajectory whose
 instance id is in neither list is skipped with a warning: the transfer test is
 supervised, so an unlabeled trajectory is unusable.
+
+Reproduce: python -m prognosis.agent.ingest_batch
 """
 
 from __future__ import annotations

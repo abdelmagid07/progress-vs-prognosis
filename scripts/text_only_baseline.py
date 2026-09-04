@@ -7,7 +7,7 @@ predict the same outcomes from the generated TEXT, using no activations at all. 
 words and commands matches an activation-space direction, the pooled number is not evidence
 about representations.
 
-This also scales up two findings that currently rest on 18 pairs:
+This also scales up two findings from the within-task pair set:
 
   * the opening-move result (arms that resolve reason longer at step 0), and
   * the qualitative lead from the extremes analysis, that low-scoring steps are re-issues of a

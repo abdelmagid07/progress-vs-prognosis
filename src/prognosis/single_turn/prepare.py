@@ -4,6 +4,8 @@
 Writes ``problems_manifest.json``, the input to ``run_control.py`` (the GPU
 step). No model weights are loaded here beyond the tokenizer (needed to
 render the exact chat-template text the GPU step will re-tokenize).
+
+Reproduce: python -m prognosis.single_turn.prepare
 """
 
 import argparse

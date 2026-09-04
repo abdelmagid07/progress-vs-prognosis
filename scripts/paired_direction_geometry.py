@@ -5,10 +5,10 @@ The paper establishes that outcome information is linearly decodable within a ta
 frozen axis does not capture it. That leaves three things unmeasured, all of which a reviewer
 can reasonably ask about given 34 training points in 5120 dimensions:
 
-  1. STABILITY. Is there one shared outcome direction, or are 18 pairs separable for 18
+  1. STABILITY. Is there one shared outcome direction, or is each pair separable for its own
      idiosyncratic reasons? Tested by splitting the pairs into DISJOINT halves, fitting a
-     direction on each, and measuring the angle between them. Disjoint is essential: the 18
-     leave-one-out directions share 16 of 17 training pairs, so their mutual agreement is
+     direction on each, and measuring the angle between them. Disjoint is essential:
+     leave-one-out directions share all but one training pair, so their mutual agreement is
      guaranteed by data overlap and says nothing.
 
   2. ALIGNMENT. "A failure of alignment, not of information" is currently a rhetorical claim
@@ -76,7 +76,7 @@ def rank_pairs(X, meta, w):
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "paired_meanpool.npz")
+    ap.add_argument("--activations", type=Path, default=ROOT / "data" / "pairs50_meanpool.npz")
     ap.add_argument("--axis", type=Path,
                     default=ROOT / "data" / "value_axis.npy")
     ap.add_argument("--layer", type=int, default=53)

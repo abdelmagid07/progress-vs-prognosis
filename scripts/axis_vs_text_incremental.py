@@ -44,7 +44,7 @@ from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from analyze_agentic_new_axis import fast_auroc  # noqa: E402
+from analyze_agentic import fast_auroc  # noqa: E402
 from text_only_baseline import GROUPS, METHOD_TRAJECTORY_FEATURES, featurise  # noqa: E402
 
 OUT_DIR = ROOT / "data"
@@ -130,7 +130,7 @@ def main() -> None:
     print(f"\n  incremental value of the axis over text: {delta:+.4f} AUROC")
 
     out = {
-        "layer_new_axis": args.layer, "n_trajectories": int(len(df)),
+        "axis_layer": args.layer, "n_trajectories": int(len(df)),
         "axis_vs_text_correlations": corr,
         "axis_explained_by_text_r2": float(r2),
         "fitted_models": fitted,

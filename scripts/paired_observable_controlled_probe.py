@@ -198,7 +198,7 @@ def main() -> None:
                   f"alone {o['n_correct']}/{o['n_pairs']}")
 
     out = {
-        "layer_new_axis": args.layer,
+        "axis_layer": args.layer,
         "C": args.C,
         "covariates": names,
         "n_covariates": len(names),

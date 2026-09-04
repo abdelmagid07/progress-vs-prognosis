@@ -30,11 +30,10 @@ def load_axis_directions(
     ``LayerActivationCapture``/``code_acts`` indexing in ``project.py`` -- must stay in that
     space, NOT the axis's own row numbering, since the returned dict's keys are reused
     downstream to index ``code_acts`` directly). ``axis_layer_offset`` is the only place the
-    axis's own indexing convention enters: 0 for the old axis (no embedding row, captured block i
-    IS axis row i), 1 for the new Jiang-faithful axis (embedding-inclusive, captured block i is
-    axis row i+1). The output ``layer`` column downstream stays in captured-block numbering
-    either way -- see the module docstring / notebook for why relabeling it was intentionally
-    avoided.
+    axis's own indexing convention enters: 0 for an axis with no embedding row, where captured
+    block i IS axis row i, and 1 for an embedding-inclusive axis, where captured block i is
+    axis row i+1. The output ``layer`` column downstream stays in captured-block numbering
+    either way.
     """
     import numpy as np
 
@@ -173,7 +172,7 @@ def run(
 
     n_total = len(problems)
     if mirror_output is not None:
-        print(f"Drive/durable mirror every {mirror_every} problems (output={mirror_output})",
+        print(f"Durable mirror every {mirror_every} problems (output={mirror_output})",
               flush=True)
 
     n_skipped = 0
@@ -222,12 +221,12 @@ def main():
                      "numbers -- these index the model's captured activations directly). "
                      "Default: all layers 0..n_layers-1.")
     ap.add_argument("--axis-layer-offset", type=int, default=0,
-                     help="Axis row = captured-block index + this offset. 0 for the old axis "
-                     "(no embedding row, captured block i IS axis row i). 1 for the new "
-                     "Jiang-faithful axis (embedding-inclusive: captured block i is axis row "
-                     "i+1). Output 'layer' column stays in captured-block numbering either way.")
+                     help="Axis row = captured-block index + this offset. 0 for an axis with "
+                     "no embedding row (captured block i IS axis row i). 1 for an "
+                     "embedding-inclusive axis (captured block i is axis row i+1). Output "
+                     "'layer' column stays in captured-block numbering either way.")
     ap.add_argument("--mirror-output", type=Path, default=None,
-                     help="Optional durable copy path for the projections parquet (e.g. Drive).")
+                     help="Optional durable copy path for the projections parquet.")
     ap.add_argument("--mirror-every", type=int, default=10,
                      help="Copy to --mirror-output every N newly completed problems.")
     ap.add_argument("--model", default=defaults["model"])
@@ -237,7 +236,8 @@ def main():
     args = ap.parse_args()
 
     if not args.axis_path.exists():
-        raise SystemExit(f"Value axis not found at {args.axis_path}. Run Stage 1 first.")
+        raise SystemExit(f"Value axis not found at {args.axis_path}. "
+                         "Reconstruct it first; see docs/REPRODUCE.md.")
 
     layers = args.layers if args.layers is not None else list(range(args.n_layers))
 

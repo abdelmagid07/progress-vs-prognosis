@@ -47,7 +47,7 @@ from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from analyze_agentic_new_axis import fast_auroc  # noqa: E402
+from analyze_agentic import fast_auroc  # noqa: E402
 from paired_opening_move_features import HEDGE_RE, extract_command, split_content  # noqa: E402
 
 OUT_DIR = ROOT / "data"

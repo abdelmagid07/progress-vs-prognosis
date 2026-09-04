@@ -140,7 +140,7 @@ def main() -> None:
                      "random_observed": float(np.mean(np.sum((rr @ Vt[:k].T) ** 2, axis=1)))}
 
     out = {
-        "layer_new_axis": args.layer, "C": args.C, "n_dims": int(d),
+        "axis_layer": args.layer, "C": args.C, "n_dims": int(d),
         "stability_disjoint_halves": {
             "n_splits": args.n_splits,
             "cosine_mean": float(cos_half.mean()), "cosine_median": float(np.median(cos_half)),
@@ -227,7 +227,7 @@ def sweep_layers(activations: Path, axis_path: Path, C: float, n_random: int = 5
         r /= np.linalg.norm(r, axis=1, keepdims=True)
         null = np.abs(r @ ax)
         k, n = rank_pairs(X, meta, w)
-        rows.append({"layer_new_axis": layer,
+        rows.append({"axis_layer": layer,
                      "abs_cosine": float(abs(w @ ax)),
                      "angle_degrees": float(np.degrees(np.arccos(min(abs(w @ ax), 1.0)))),
                      # SIGNED cosine as well as absolute. The sign is the finding at layers

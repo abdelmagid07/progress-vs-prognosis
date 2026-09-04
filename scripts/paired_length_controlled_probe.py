@@ -155,7 +155,7 @@ def main() -> None:
             mm2 = (meta_a["layer"] == L_ax - 1).to_numpy()
             Xl, ml = Xa[mm2], meta_a.loc[mm2].reset_index(drop=True)
             Lv = covariates(ml, args.projections)["total_generated_tokens"]
-            rows.append({"layer_new_axis": L_ax,
+            rows.append({"axis_layer": L_ax,
                          "raw": loo_rank(Xl, ml, Lv, args.C, "raw")["n_correct"],
                          "residualised": loo_rank(Xl, ml, Lv, args.C,
                                                   "residualised")["n_correct"]})
@@ -168,7 +168,7 @@ def main() -> None:
               f"residualised {int((res >= 14).sum())}/64")
 
     out = {
-        "layer_new_axis": args.layer,
+        "axis_layer": args.layer,
         "C": args.C,
         "readouts": results,
         "layer_sweep": sweep,

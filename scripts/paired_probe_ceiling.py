@@ -93,15 +93,15 @@ def main() -> None:
         for L in layers:
             m = meta["layer"] == L
             r = leave_one_pair_out(X[m.to_numpy()], meta.loc[m].reset_index(drop=True), C)
-            r.update({"layer_captured_block": int(L), "layer_new_axis": int(L) + 1, "C": C})
+            r.update({"layer_captured_block": int(L), "axis_layer": int(L) + 1, "C": C})
             rows.append(r)
         best = max((x for x in rows if x["C"] == C), key=lambda x: x["frac_correct"])
-        print(f"  C={C:<6} best layer {best['layer_new_axis']:>2} (new-axis): "
+        print(f"  C={C:<6} best layer {best['axis_layer']:>2} (axis row): "
               f"{best['n_correct']}/{best['n_pairs']} pairs correct, sign p={best['sign_p']:.4f}",
               flush=True)
 
     df = pd.DataFrame(rows)[
-        ["C", "layer_captured_block", "layer_new_axis", "n_pairs", "n_correct",
+        ["C", "layer_captured_block", "axis_layer", "n_pairs", "n_correct",
          "frac_correct", "sign_p"]]
     csv = OUT_DIR / "paired_probe_ceiling.csv"
     df.to_csv(csv, index=False)
@@ -150,7 +150,7 @@ def main() -> None:
     print(f"cells with p<0.05: {len(any_sig)}/{len(df)} "
           f"(expected ~{0.05*len(df):.0f} by chance)")
     b = summary["best_cell"]
-    print(f"best cell: layer {b['layer_new_axis']} (new-axis), C={b['C']}, "
+    print(f"best cell: layer {b['axis_layer']} (axis row), C={b['C']}, "
           f"{b['n_correct']}/{b['n_pairs']} correct, p={b['sign_p']:.4f}")
     print(f"\nwrote {csv}")
 

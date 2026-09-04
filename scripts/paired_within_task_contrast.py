@@ -25,14 +25,14 @@ STATISTICS. Both tests are paired and distribution-free, matching the spec:
     magnitude of each difference, not just its sign.
   * Exact binomial sign test on the count of pairs where resolved > unresolved --
     secondary and deliberately conservative; it throws away magnitude and therefore
-    needs 15/20 pairs to reach p < 0.05.
+    needs 33/50 pairs to reach p < 0.05.
 No bootstrap/BCa here: those are for the 500-task benchmark's AUROC/AUPRC. The paired
 sub-study is a different question with a different, smaller design.
 
-POWER. With 20 pairs the sign test needs 15/20 for p < 0.05, and even a true
-within-pair rate equal to the pooled AUROC (0.747) only yields ~0.61 power. A null
-result on 20 pairs is therefore genuinely inconclusive rather than evidence of
-absence, and this script prints the achieved counts so that can be stated honestly.
+POWER. With 50 pairs the sign test needs 33/50 for p < 0.05, and a true within-pair
+rate equal to the pooled AUROC (0.747) would yield ~0.94 power. A null result at this
+size is therefore informative rather than merely underpowered, and this script prints
+the achieved counts so that can be stated honestly.
 
 Reproduce: python scripts/paired_within_task_contrast.py
 """

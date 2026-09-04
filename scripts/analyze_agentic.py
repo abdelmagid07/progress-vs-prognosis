@@ -1,15 +1,14 @@
 #!/usr/bin/env python
-"""Phase 4: agentic transfer analyses against the NEW (Jiang-faithful) axis.
+"""Agentic transfer analyses against the frozen value axis.
 
-Input: projections_full_new_axis.parquet (output of
-notebooks/). Its ``layer`` column is
-already in new-axis (embedding-inclusive) numbering, covering layers 1-64; layer 0
-(the pure embedding row) is not recoverable from the cached mean-pooled activations.
+Input: the full-run projections table. Its ``layer`` column is in
+embedding-inclusive numbering, covering layers 1-64; layer 0 (the pure embedding
+row) is not recoverable from the cached mean-pooled activations.
 
 Produces, into data/:
   * agentic_final_step_auroc_by_layer.csv  -- full 64-layer final-step sweep, with CIs
   * agentic_position_bins_peak_layer.csv   -- position-bin evolution at the peak layer
-  * agentic_new_axis_summary.json          -- headline numbers
+  * agentic_summary.json                   -- headline numbers
 
 STATISTICS. The repo's authoritative machinery is prognosis/analysis/stats.py
 (``auroc_with_ci`` = task-level BCa bootstrap, ``permutation_test_auroc`` = block
@@ -28,11 +27,10 @@ holds.
 PEAK-LAYER SELECTION IS POST-HOC. The peak layer is chosen by scanning all 64 layers
 on the same trajectories whose AUROC is then reported, so the peak-layer value is
 optimistically biased and is an exploratory descriptive statistic, not a held-out
-estimate. This matches the project convention of reporting the full sweep and the
-peak layer's position-bin evolution, with the selection explicitly labelled -- see
-the layer-selection convention recorded in docs/DATA.md.
+estimate. The full sweep is reported alongside the
+peak layer's position-bin evolution, with the selection explicitly labelled.
 
-Reproduce: python scripts/analyze_agentic_new_axis.py
+Reproduce: python scripts/analyze_agentic.py
 """
 
 from __future__ import annotations
@@ -382,13 +380,12 @@ def main() -> None:
             "acted, which is consistent with the axis reading static task difficulty off the "
             "prompt rather than tracking trajectory progress. See agentic_confound_checks.json.",
             "proj_mean here is cosine-of-meanvec (from the cached mean-pooled activations), "
-            "not the original per-token mean-of-cosines; validated against the old axis in the "
-            "re-projection notebook.",
+            "not the original per-token mean-of-cosines.",
             "proj_final (single-final-token readout) is not recoverable from the cache.",
             "Single-seed run (one trajectory per task): no within-task contrast is possible.",
         ],
     }
-    summary_path = OUT_DIR / "agentic_new_axis_summary.json"
+    summary_path = OUT_DIR / "agentic_summary.json"
     summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(f"\nwrote {summary_path}", flush=True)
 

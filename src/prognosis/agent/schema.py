@@ -1,4 +1,4 @@
-"""Normalized trajectory schema shared across Stage 2.
+"""Normalized trajectory schema shared across the agent pipeline.
 
 A *normalized* trajectory is the model-agnostic representation the projection
 step reads: one record per agent run, one step per model turn. It is decoupled
@@ -26,7 +26,7 @@ On-disk form (one JSON file per trajectory) matches
       ]
     }
 
-Thinking-mode note (project decision 2026-07-17: thinking is ON in Stage 2):
+Thinking-mode note (thinking is enabled throughout):
 under Qwen3 thinking-on with vLLM's reasoning + hermes tool parsers, a generated
 turn is split into three fields — ``content`` (post-think prose),
 ``reasoning_content`` (the ``<think>`` text), and structured ``tool_calls``. The

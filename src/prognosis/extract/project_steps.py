@@ -69,8 +69,8 @@ def assert_thinking_mode_matches(
     the mode the trajectory was *generated* under, the tokenization (and thus the
     activation we read) no longer corresponds to what the model actually computed.
     That silently corrupts every projection, so we refuse to proceed either way.
-    (Stage 2 runs thinking-ON by default as of 2026-07-17; legacy thinking-off
-    data can still be projected with ``--no-enable-thinking``.)
+    (Trajectories are generated thinking-on by default; thinking-off data can still
+    be projected with ``--no-enable-thinking``.)
     """
     generated_with_thinking = trajectory_uses_thinking(records)
     if generated_with_thinking and not enable_thinking:
@@ -159,10 +159,10 @@ def load_axis_directions(
     activations directly -- shifting them would silently read the wrong block.
 
     ``axis_layer_offset`` is the only place the axis file's own row-numbering
-    convention enters: 0 for the original hand-built axis (no embedding row, so
-    captured block i IS axis row i), 1 for the Jiang-faithful axis, which is built
-    with ``output_hidden_states=True`` and therefore has an extra leading embedding
-    row (65 rows for 64 blocks), making captured block i axis row i+1. Passing the
+    convention enters: 0 for an axis with no embedding row, where captured block i IS
+    axis row i, and 1 for an embedding-inclusive axis, built with
+    ``output_hidden_states=True`` and therefore carrying an extra leading embedding row
+    (65 rows for 64 blocks), making captured block i axis row i+1. Passing the
     wrong value shifts every layer by one and silently produces plausible-looking
     but wrong numbers.
     """
@@ -243,7 +243,7 @@ class ActivationSink:
                 rel_pos=np.array(self.rel_pos, dtype=np.float64),
                 layer=np.array(self.layer, dtype=np.int64),
             )
-            # Drive FUSE: os.replace can fail; shutil.move is more reliable
+            # FUSE-mounted storage: os.replace can fail; shutil.move is more reliable
             if path.exists():
                 path.unlink()
             shutil.move(str(tmp), str(path))
@@ -418,7 +418,7 @@ def _mirror_checkpoint(
     mirror_output: Path | None,
     mirror_activations: Path | None,
 ) -> None:
-    """Copy local checkpoints to a durable mirror (e.g. Google Drive)."""
+    """Copy local checkpoints to a durable mirror."""
     import shutil
 
     def _copy_replace(src: Path, dst: Path) -> None:
@@ -528,7 +528,7 @@ def run(
     )
     if mirror_output is not None or mirror_activations is not None:
         print(
-            f"Drive/durable mirror every {mirror_every} trajs "
+            f"durable mirror every {mirror_every} trajs "
             f"(output={mirror_output}, activations={mirror_activations})",
             flush=True,
         )
@@ -651,13 +651,13 @@ def main():
         "--mirror-output",
         type=Path,
         default=None,
-        help="Optional durable copy path for the projections parquet (e.g. Google Drive).",
+        help="Optional durable copy path for the projections parquet.",
     )
     ap.add_argument(
         "--mirror-activations",
         type=Path,
         default=None,
-        help="Optional durable copy path for the activations npz (e.g. Google Drive).",
+        help="Optional durable copy path for the activations npz.",
     )
     ap.add_argument(
         "--mirror-every",
@@ -674,9 +674,9 @@ def main():
         "--axis-layer-offset",
         type=int,
         default=0,
-        help="Axis row = captured-block index + this offset. 0 for the original axis "
-        "(no embedding row). 1 for the Jiang-faithful axis, which is embedding-inclusive "
-        "(65 rows for 64 blocks), so captured block i is axis row i+1. The output 'layer' "
+        help="Axis row = captured-block index + this offset. 0 for an axis with no "
+        "embedding row. 1 for an embedding-inclusive axis (65 rows for 64 blocks), so "
+        "captured block i is axis row i+1. The output 'layer' "
         "column stays in captured-block numbering either way.",
     )
     ap.add_argument(
@@ -684,8 +684,8 @@ def main():
         action=argparse.BooleanOptionalAction,
         default=defaults["enable_thinking"],
         help="Render the chat template with Qwen3 thinking mode. Defaults to the "
-        "config value (thinking ON in Stage 2); use --no-enable-thinking to "
-        "project legacy thinking-off trajectories.",
+        "config value; use --no-enable-thinking to project thinking-off "
+        "trajectories.",
     )
     ap.add_argument(
         "--no-thinking-check",

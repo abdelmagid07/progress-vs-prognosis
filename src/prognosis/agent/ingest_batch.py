@@ -138,7 +138,7 @@ def _seed_from_path(traj_path: Path, traj_dir: Path) -> int | None:
     """Recover a rollout seed from an ``r<seed>/`` ancestor directory.
 
     The multi-rollout runner writes each seed's trajectories under
-    ``<run>/r<seed>/…`` (Chunk C). A flat run directory (single rollout / legacy)
+    ``<run>/r<seed>/…``. A flat run directory (single rollout)
     has no such component and yields ``None``.
     """
     try:

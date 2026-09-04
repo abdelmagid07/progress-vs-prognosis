@@ -39,7 +39,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from analyze_agentic_new_axis import fast_auroc, fast_auroc_bca  # noqa: E402
+from analyze_agentic import fast_auroc, fast_auroc_bca  # noqa: E402
 
 OUT_DIR = ROOT / "data"
 
@@ -122,7 +122,7 @@ def main() -> None:
                                 rs["final_step"].proj_mean.to_numpy(),
                                 n_boot=args.n_boot, seed=args.layer)
     out = {
-        "layer_new_axis": args.layer,
+        "axis_layer": args.layer,
         "termination_by_outcome": xtab.to_dict(),
         "n_limits_exceeded_unresolved": int(xtab.loc["LimitsExceeded", "unresolved"])
         if "LimitsExceeded" in xtab.index else 0,

@@ -21,7 +21,7 @@ class LayerActivationCapture:
 
     ``token_indices`` (optional): if set, only those sequence positions are kept
     (saves VRAM on long agent contexts). ``store_device`` defaults to the
-    activation device; use ``"cpu"`` for Stage-2 projection of long trajectories.
+    activation device; use ``"cpu"`` when projecting long agent trajectories.
     """
 
     def __init__(

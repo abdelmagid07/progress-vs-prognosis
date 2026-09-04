@@ -166,13 +166,13 @@ def main() -> None:
     ap.add_argument("--activations", type=Path, default=ROOT / "data" / "pairs50_meanpool.npz")
     ap.add_argument("--trajectories", type=Path,
                      default=ROOT / "data" / "normalized_pairs.zip")
-    ap.add_argument("--layer-new-axis", type=int, default=53)
+    ap.add_argument("--axis-layer", type=int, default=53)
     ap.add_argument("--C", type=float, default=0.1)
     args = ap.parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # --- 1. held-out margin from the SAME k=1 probe as the reported step-0 result --------
-    block = args.layer_new_axis - 1
+    block = args.axis_layer - 1
     acts, m = load(args.activations, block)
     V, info = traj_vectors(acts, m, max_steps=1)
     scored = leave_one_pair_out_scores(V, info, args.C)
@@ -230,7 +230,7 @@ def main() -> None:
     out_csv = OUT_DIR / "paired_opening_move_features.csv"
     merged.drop(columns=["score"]).to_csv(out_csv, index=False)
     summary = {
-        "layer_new_axis": args.layer_new_axis,
+        "axis_layer": args.axis_layer,
         "C": args.C,
         "activation_probe_k1": {
             "n_correct": n_correct, "n_pairs": int(scored["task_id"].nunique()),

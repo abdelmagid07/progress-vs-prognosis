@@ -16,8 +16,8 @@ those stages produce.
 
 ## Paper section to script
 
-Filled in as each stage is ported. Each row names the module that computes the
-reported number and the file it writes under `data/`.
+Each row names the module that computes the reported number and the file it
+writes under `data/`. The stage 4-6 analyses are tabulated in full below.
 
 | Paper section | Result | Script | Output |
 |---|---|---|---|
@@ -56,9 +56,9 @@ steps:
 1. **Extract per-token projections** (GPU). For every classified token, record its dot
    product against each reward function's before-mean and after-mean at every layer.
    The token classification is the upstream function, imported from the clone rather
-   than reimplemented. The result is a `(n_tokens, n_layers, 2 * n_functions)` table;
-   at the sizes reported in the paper this is roughly 1.1 GB, so it is not
-   distributed here. The run checkpoints every 25 conversations and resumes.
+   than reimplemented. The result is a `(n_tokens, n_layers, 2 * n_functions)` table,
+   roughly 1.1 GB at the sizes reported in the paper, so allow disk for it. The run
+   checkpoints every 25 conversations and resumes.
 
    ```bash
    python -m prognosis.axis.token_projection_extraction --value-axis-repo value-axis
@@ -98,7 +98,7 @@ needs a served model but no local GPU. `configs/providers/` holds the two reques
 shapes; select one with `MODEL_PROVIDER` rather than editing the model config.
 
 ```bash
-bash scripts/run_mini_swe_batch.sh configs/selected_instances.txt
+bash scripts/run_mini_swe_batch.sh
 python -m prognosis.agent.ingest_batch --traj-dir data/trajectories/<run>     --format mini-swe-agent
 python -m prognosis.agent.confidence
 ```
@@ -177,7 +177,7 @@ Grouped by the part of the paper they support:
 
 | Script | Reports |
 |---|---|
-| `analyze_agentic_new_axis.py` | Final-step AUROC, the layer sweep, per-position bins |
+| `analyze_agentic.py` | Final-step AUROC, the layer sweep, per-position bins |
 | `readout_and_termination_checks.py` | Run termination and trajectory length |
 | `logit_lens_replication.py` | Vocabulary ranking of the axis under a logit lens |
 
@@ -208,6 +208,7 @@ Grouped by the part of the paper they support:
 | `error_rule.py` | Error definition, text rules against exit status |
 | `error_categories.py` | Measurable responses by error category |
 | `error_event_response.py` | Trajectory-level contrast and event-aligned time course |
+| `error_response_outcome_direction.py` | Both directions on both readouts: the double dissociation |
 
 The probe fitting itself lives in `prognosis.analysis.fit_probes`; the shared
 interval, permutation, and paired-test machinery in `prognosis.analysis.stats`.
@@ -215,8 +216,7 @@ interval, permutation, and paired-test machinery in `prognosis.analysis.stats`.
 
 ## Inputs and where each comes from
 
-Nothing under `data/` ships with this repository. Every default input is produced by a stage
-above:
+Every input the analyses default to is produced by a stage above:
 
 | Input | Produced by |
 |---|---|

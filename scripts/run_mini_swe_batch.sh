@@ -1,23 +1,21 @@
 #!/usr/bin/env bash
 # Real SWE-bench batch with mini-swe-agent driving on-policy Qwen3.
 #
-# This is the primary generation path for paper data. It replaces the legacy
-# SWE-agent path (scripts/run_pilot_batch.sh + config/swe_agent_qwen.yaml),
-# which is kept only until this path is verified end to end.
+# This is the generation path for the agent trajectories the paper analyses.
 #
 # Topology:
-#   - This machine (WSL2): mini-swe-agent + Docker containers + tests.
+#   - Local host: mini-swe-agent + Docker containers + tests.
 #   - Model inference: self-hosted vLLM *or* Azure Foundry managed compute.
-#     Switch with MODEL_PROVIDER (see config/providers/).
+#     Switch with MODEL_PROVIDER (see configs/providers/).
 #
 # Prerequisites (local):
-#   1. Docker daemon running and reachable from WSL2.
-#   2. pip install -e ".[swe]"   (installs mini-swe-agent + the swebench harness)
+#   1. Docker daemon running and reachable.
+#   2. pip install -e ".[agent]" (installs mini-swe-agent + the swebench harness)
 #   3. A reachable remote model endpoint (set MODEL_API_BASE).
 #
 # Environment:
 #   MODEL_PROVIDER   vllm (default) | azure
-#                    Selects config/providers/<name>.yaml (request-shape adapter).
+#                    Selects configs/providers/<name>.yaml (request-shape adapter).
 #   MODEL_API_BASE   OpenAI-compatible base URL
 #                    vllm:  http://localhost:8000/v1  or tunnel .../v1
 #                    azure: https://<resource>.services.ai.azure.com/openai/v1
@@ -42,14 +40,14 @@
 # Usage:
 #   # vLLM 8B (default)
 #   export MODEL_API_BASE="http://localhost:8000/v1"
-#   bash scripts/run_mini_swe_batch.sh config/pilot_instances.txt
+#   bash scripts/run_mini_swe_batch.sh
 #
 #   # Azure Foundry 32B
 #   export MODEL_PROVIDER=azure
 #   export MODEL_API_BASE="https://<resource>.services.ai.azure.com/openai/v1"
 #   export MODEL_API_KEY="..."
 #   export MODEL_NAME="openai/qwen3-32b"
-#   bash scripts/run_mini_swe_batch.sh config/pilot_instances.txt
+#   bash scripts/run_mini_swe_batch.sh
 #
 # Any extra args after the instances file are forwarded to `mini-extra swebench`.
 
@@ -75,12 +73,14 @@ SEED_BASE="${SEED_BASE:-0}"
 # Nest each rollout under r<seed>/ and inject its seed when doing multiple
 # rollouts or when a specific seed was pinned; a plain single run stays flat.
 if [[ "$ROLLOUTS" -gt 1 || "$SEED_BASE_EXPLICIT" == "1" ]]; then NEST_SEED=1; else NEST_SEED=0; fi
-INSTANCES_FILE="${1:-config/pilot_instances.txt}"
+# Optional: a file of SWE-bench instance ids, one per line, to restrict the run.
+# With no argument the full $SUBSET/$SPLIT subset runs (Verified is the 500-task set).
+INSTANCES_FILE="${1:-}"
 shift || true
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 OUTPUT_DIR="${OUTPUT_DIR:-data/trajectories/mini_swe_run_${TIMESTAMP}}"
-OVERRIDE_CFG="config/mini_swe_qwen.yaml"
-PROVIDER_CFG="config/providers/${MODEL_PROVIDER}.yaml"
+OVERRIDE_CFG="configs/mini_swe_qwen.yaml"
+PROVIDER_CFG="configs/providers/${MODEL_PROVIDER}.yaml"
 
 if [[ ! -f "$PROVIDER_CFG" ]]; then
   echo "ERROR: unknown MODEL_PROVIDER=$MODEL_PROVIDER (no $PROVIDER_CFG)"
@@ -89,12 +89,12 @@ if [[ ! -f "$PROVIDER_CFG" ]]; then
 fi
 
 if ! command -v mini-extra >/dev/null 2>&1; then
-  echo "ERROR: mini-extra not found. Install with: pip install -e \".[swe]\""
+  echo "ERROR: mini-extra not found. Install with: pip install -e \".[agent]\""
   exit 1
 fi
 
 if ! docker info >/dev/null 2>&1; then
-  echo "ERROR: Docker is not reachable. Start Docker Desktop / the daemon in WSL2."
+  echo "ERROR: Docker is not reachable. Start the Docker daemon."
   exit 1
 fi
 
@@ -126,7 +126,7 @@ if [[ "${SKIP_PREFLIGHT:-0}" != "1" ]]; then
     echo "Checklist:"
     echo "  - MODEL_API_BASE must be .../openai/v1  (not .../chat/completions,"
     echo "    and not .../managed-deployments/... for this preflight)"
-    echo "  - Export vars in THIS shell:  set -a && source ../.env && set +a"
+    echo "  - Export vars in THIS shell:  set -a && source .env && set +a"
     echo "  - Azure deploy still Succeeded + Playground chat works?"
     echo "  - Temporary bypass:  SKIP_PREFLIGHT=1 bash scripts/run_mini_swe_batch.sh ..."
     exit 1
@@ -145,7 +145,7 @@ if [[ -f "$INSTANCES_FILE" ]]; then
     echo "Filtering to $(grep -cvE '^\s*(#|$)' "$INSTANCES_FILE") instance ids from $INSTANCES_FILE"
   fi
 else
-  echo "No instances file at $INSTANCES_FILE; running the full $SUBSET/$SPLIT subset."
+  echo "No instances file given; running the full $SUBSET/$SPLIT subset."
 fi
 
 echo "=== mini-swe-agent SWE-bench batch (local Docker -> remote model) ==="
@@ -215,5 +215,5 @@ fi
 echo "  # then (ingest walks r<seed>/ subdirs and reads each rollout's results.json):"
 echo "  python -m prognosis.agent.ingest_batch --traj-dir $OUTPUT_DIR --format mini-swe-agent"
 echo ""
-echo "Then run the GPU projection step (prognosis.extract.project_steps) ON THE A100,"
+echo "Then run the GPU projection step (prognosis.extract.project_steps) on a GPU host,"
 echo "not locally — it needs raw residual-stream activations, which the API cannot give."

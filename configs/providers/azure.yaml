@@ -1,7 +1,7 @@
 # Provider: Azure AI Foundry managed compute (OpenAI-compatible /openai/v1).
 # Use: MODEL_PROVIDER=azure
 #
-# Validated 2026-07-26 against qwen3-32b on Global Managed Compute:
+# Validated against qwen3-32b on Azure managed compute:
 #   - REJECTS: chat_template_kwargs, enable_thinking, top_k
 #   - ACCEPTS: temperature, top_p, seed (extra_body.seed or top-level)
 #   - Thinking ON by default; soft-switch via /think and /no_think in user text

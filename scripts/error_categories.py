@@ -102,7 +102,7 @@ def main() -> None:
 
     sd = float(df["axis"].std())
     clean = df.loc[df.category == "clean", "d_axis"].dropna()
-    out = {"layer_new_axis": args.layer, "n_steps": int(len(df)),
+    out = {"axis_layer": args.layer, "n_steps": int(len(df)),
            "signal_sd": sd,
            "clean": {"n": int(len(clean)), "mean_delta": float(clean.mean()),
                      "mean_delta_sd_units": float(clean.mean() / sd)},

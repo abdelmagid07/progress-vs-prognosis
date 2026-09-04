@@ -33,7 +33,7 @@ The resolved/unresolved *outcome* is not in this file; it comes from the
 SWE-bench evaluation harness ``results.json`` and is passed in by the caller
 (see :mod:`prognosis.agent.ingest_batch`).
 
-Thinking-mode note (thinking is ON in Stage 2 as of 2026-07-17): with Qwen3
+Thinking-mode note (thinking is enabled throughout): with Qwen3
 thinking-on served through vLLM's reasoning + hermes tool parsers, each stored
 assistant message is ``response.choices[0].message`` dumped verbatim, so its
 ``content`` is the post-think prose, the ``<think>`` text lives in a sibling

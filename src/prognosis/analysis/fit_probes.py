@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-"""Fit logistic probes on mean-pooled agentic activations (The paper Stage 5).
+"""Fit logistic probes on mean-pooled agentic activations.
 
 The frozen-axis test asks whether the *original* representation persists. A
 frozen axis can fail while outcome information remains decodable in a different
 direction; this module is that decodability reference.
 
-Protocol (The paper):
+Protocol:
   - Features: per-step mean-pooled residual activations dumped by
     ``project_steps --activations-npz`` (one vector per step × layer).
   - Standardization fit on the training fold only.
@@ -194,7 +194,7 @@ def run(
     grid.to_csv(grid_csv, index=False)
 
     # Never promote the max as a tuned ceiling — report it only as a summary
-    # alongside the full grid (The paper).
+    # alongside the full grid.
     valid = grid.dropna(subset=["auroc"])
     summary = {
         "n_rows": int(len(meta)),

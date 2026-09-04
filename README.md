@@ -37,7 +37,7 @@ Concretely, the pipeline here:
 | `docs/` | Reproduction order and data provenance |
 
 `docs/REPRODUCE.md` gives the end-to-end order and which stages need a GPU.
-`docs/DATA.md` records what ships in this repository and what has to be regenerated.
+`docs/DATA.md` records the axis provenance and the indexing conventions.
 
 ## Setup
 

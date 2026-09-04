@@ -218,7 +218,7 @@ def main() -> None:
     print(f"{len(df)} steps over {df.trajectory_id.nunique()} trajectories; "
           f"{df.is_error.mean()*100:.1f}% of steps end in an error observation\n")
 
-    out = {"layer_new_axis": args.layer, "n_steps": int(len(df)),
+    out = {"axis_layer": args.layer, "n_steps": int(len(df)),
            "n_trajectories": int(df.trajectory_id.nunique()),
            "error_step_fraction": float(df.is_error.mean())}
 

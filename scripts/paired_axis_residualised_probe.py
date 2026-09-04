@@ -105,7 +105,7 @@ def main() -> None:
         }
 
     res = arms_at(args.layer)
-    out = {"layer_new_axis": args.layer, "C": args.C, "n_dims": int(Xa.shape[1]),
+    out = {"axis_layer": args.layer, "C": args.C, "n_dims": int(Xa.shape[1]),
            "headline": res}
 
     print(f"layer {args.layer}, C={args.C}, {Xa.shape[1]} dimensions")
@@ -118,7 +118,7 @@ def main() -> None:
         rows = []
         for L in range(1, 65):
             a = arms_at(L)
-            rows.append({"layer_new_axis": L,
+            rows.append({"axis_layer": L,
                          "raw": a["raw"]["n_correct"],
                          "axis_residualised": a["axis_residualised"]["n_correct"]})
         out["layer_sweep"] = rows

@@ -103,7 +103,7 @@ def main() -> None:
             problems.append(f"{task}: state says a failing arm exists, but none is normalized")
             continue
         # Multiple rounds can leave more than one failure; take the seed the state recorded so
-        # the shipped arm is the one the run log describes.
+        # the packaged arm is the one the run log describes.
         seed = state["tasks"][task]["failing_seed"]
         chosen = next((p for p in cands if load_norm(p).get("seed") == seed), cands[0])
         rec = load_norm(chosen)
@@ -165,7 +165,7 @@ def main() -> None:
         "n_trajectories": 2 * len(pairs),
         "tasks": pairs,
         "main_run_normalized": str(main_norm),
-        "note": "both arms shipped: the main run's parquet lacks proj_final/n_gen_tokens, so "
+        "note": "both arms re-projected: the main run's parquet lacks proj_final/n_gen_tokens, so "
                 "resolved arms are re-projected under the paired pipeline for comparability",
     }
     (out / "pair_package.json").write_text(json.dumps(manifest, indent=2),

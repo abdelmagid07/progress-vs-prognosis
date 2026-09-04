@@ -42,7 +42,7 @@ from scipy.stats import binomtest, norm
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from analyze_agentic_new_axis import _bca_bounds, fast_auroc  # noqa: E402
+from analyze_agentic import _bca_bounds, fast_auroc  # noqa: E402
 
 OUT_DIR = ROOT / "data"
 ALPHA = 0.05
@@ -181,7 +181,7 @@ def main() -> None:
     # and L2 normalisation the probe result requires; paired_direction_control.py's all-steps
     # row omits the truncation and reads 18/18 here instead of 17/18.
     pc = pd.read_csv(args.probe_csv)
-    cell = pc[(pc.layer_new_axis == args.layer) & (pc.C == args.probe_C)]
+    cell = pc[(pc.axis_layer == args.layer) & (pc.C == args.probe_C)]
     if len(cell) != 1:
         raise SystemExit(f"probe cell not unique for layer {args.layer}, C={args.probe_C}")
     k_probe = int(cell.n_correct.iloc[0])
@@ -242,7 +242,7 @@ def main() -> None:
     ]
 
     out = {
-        "layer_new_axis": args.layer,
+        "axis_layer": args.layer,
         "estimand": "P(resolved run scores above unresolved run), under increasing conditioning",
         "chance": 0.5,
         "n_boot": args.n_boot,

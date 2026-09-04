@@ -70,7 +70,7 @@ def run_analyses(
     if primary_layer is not None and "layer" in df.columns and df["layer"].nunique() > 1:
         df = df[df["layer"] == primary_layer]
 
-    # Primary: AUROC per position bin with task-level BCa CI (The paper).
+    # Primary: AUROC per position bin with task-level BCa CI.
     pos_df = auroc_by_position(df, n_bins=n_bins)
     pos_csv = output_dir / "auroc_by_position.csv"
     pos_df.to_csv(pos_csv, index=False)

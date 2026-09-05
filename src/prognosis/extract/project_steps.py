@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 """Replay agent trajectories through the model and extract value-axis projections.
 
-Reproduce: python -m prognosis.extract.project_steps
+``--axis-layer-offset 1`` is required for the reconstructed axis used in this work: it
+is embedding-inclusive (65 rows for 64 blocks), so captured block ``i`` is axis row
+``i+1``. The flag defaults to ``0``, which is correct only for an axis with no
+embedding row; omitting it projects onto the wrong axis row at every layer and still
+writes a table the downstream layer guard accepts, because that guard checks the
+``layer`` column's numbering rather than which axis row the direction came from.
+
+Reproduce: python -m prognosis.extract.project_steps --axis-layer-offset 1
 """
 
 from __future__ import annotations

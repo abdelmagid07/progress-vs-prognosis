@@ -5,7 +5,12 @@ Resumable checkpoint loop at the granularity of one DebugBench problem
 (slug): all of a slug's rows, the original plus every corrupted variant, are
 computed and checkpointed together, so a checkpoint is always slug-atomic.
 
-Reproduce: python -m prognosis.single_turn.run_control
+``--axis-layer-offset 1`` is required for the reconstructed axis used here: it is
+embedding-inclusive, so captured block ``i`` is axis row ``i+1``. The flag defaults to
+``0``, which is correct only for an axis with no embedding row. The reported primary
+layer 36 is a captured block, i.e. axis row 37.
+
+Reproduce: python -m prognosis.single_turn.run_control --axis-layer-offset 1
 """
 
 import argparse

@@ -19,13 +19,12 @@ direction because of unembedding geometry.
 
 Writes data/logit_lens_replication.json.
 
-Reproduce: python scripts/logit_lens_replication.py
+Reproduce: python scripts/logit_lens_replication.py --shard <path-to-lm_head-shard.safetensors>
 """
 
 from __future__ import annotations
 
 import argparse
-import glob
 import json
 import sys
 from pathlib import Path
@@ -51,7 +50,10 @@ JIANG_TOP30 = [
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--shard", type=Path, default=None)
+    ap.add_argument("--shard", type=Path, default=None,
+                    help="Model .safetensors shard containing 'lm_head.weight'. Required: "
+                         "the unembedding is read by streaming this file, and its location "
+                         "depends on your Hugging Face cache layout.")
     ap.add_argument("--axis", type=Path,
                     default=ROOT / "data" / "value_axis.npy")
     ap.add_argument("--tokenizer", default="Qwen/Qwen3-32B")
@@ -61,8 +63,12 @@ def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    shard = args.shard or Path(sorted(glob.glob(
-        "D:/hf-cache/**/*.safetensors", recursive=True))[0])
+    if args.shard is None:
+        raise SystemExit(
+            "--shard is required: give the model .safetensors shard holding 'lm_head.weight', "
+            "e.g. --shard <hf-cache>/models--Qwen--Qwen3-32B/snapshots/<rev>/model-000NN-of-000MM.safetensors"
+        )
+    shard = args.shard
     from transformers import AutoTokenizer  # noqa: PLC0415
     tok = AutoTokenizer.from_pretrained(args.tokenizer)
 

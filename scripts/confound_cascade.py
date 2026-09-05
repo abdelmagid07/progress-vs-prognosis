@@ -14,11 +14,11 @@ the figure would be misleading if they were.
 
 Reading down the rows, the apparent transfer is progressively removed by conditioning:
 
-    all pairs, final step          0.747   the headline
-    all pairs, at step 0           0.723   present before the agent acts
-    same length stratum            ~0.60   most of it was length
-    same task, final step          31/50   nothing left
-    same task, trajectory mean      22/50  at chance
+    across tasks, final step       0.747   the headline
+    across tasks, at step 0        0.723   present before the agent acts
+    across tasks, length-matched   0.646   length accounts for ~40% of the excess over chance
+    within task, final step        31/50   nothing left
+    within task, trajectory mean   22/50   at chance
 
 Intervals: BCa bootstrap over trajectories for the two unconditioned rows and the stratified
 row (matching the rest of the paper); Wilson score intervals for the two paired rows, since

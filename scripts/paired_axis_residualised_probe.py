@@ -11,7 +11,10 @@ Three arms on the same folds:
 
   raw                the probe as reported in the paper
   axis-residualised  activations with their component along v^(l) projected out
-  axis only          the frozen axis score alone, as the floor -- the reported 22/50
+  axis only          the frozen axis score alone, as the floor. This is a probe fitted on the
+                     one-dimensional axis projection, so it is not the same estimator as the
+                     22/50 within-task value-axis row in confound_cascade.json (a direct
+                     comparison of per-arm mean projections) and does not equal it.
 
 NO LEAKAGE CONCERN, unlike the length control. The length residualisation in
 paired_length_controlled_probe.py must be fitted inside each fold because the length->activation

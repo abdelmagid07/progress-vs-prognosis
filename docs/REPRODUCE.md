@@ -80,10 +80,14 @@ any agentic transfer is attempted. Each DebugBench problem contributes its corre
 solution and four corrupted variants; the axis should score the correct one higher.
 
 ```bash
-python -m prognosis.single_turn.prepare      # CPU: problems and rendered prompts
-python -m prognosis.single_turn.run_control  # GPU: one forward pass per variant
-python -m prognosis.single_turn.analyze      # CPU: AUROC, BCa CI, permutation
+python -m prognosis.single_turn.prepare                            # CPU: problems and rendered prompts
+python -m prognosis.single_turn.run_control --axis-layer-offset 1  # GPU: one forward pass per variant
+python -m prognosis.single_turn.analyze                            # CPU: AUROC, BCa CI, permutation
 ```
+
+``--axis-layer-offset 1`` is required here for the same reason as in stage 3: the
+axis is embedding-inclusive, so captured block ``i`` is axis row ``i+1``. The
+reported primary layer 36 is a captured block, i.e. axis row 37.
 
 Three readouts are computed in the same pass. The window readout is the one
 comparable to the original paper: it averages only over tokens after the point
@@ -147,9 +151,16 @@ cosine as a robustness column, and dumps the mean-pooled activation vectors the
 probes are later fitted on, so the model is never replayed.
 
 ```bash
-python -m prognosis.extract.project_steps --traj-dir data/normalized/<run>     --output data/projections_full.parquet --activations-npz data/full_meanpool.npz
+python -m prognosis.extract.project_steps --traj-dir data/normalized/<run>     --output data/projections_full.parquet --activations-npz data/full_meanpool.npz     --axis-layer-offset 1
 python scripts/normalize_pair_layers.py --path data/projections_full.parquet
 ```
+
+``--axis-layer-offset 1`` is required, not optional. The reconstructed axis is
+embedding-inclusive (65 rows for 64 blocks), so captured block ``i`` is axis row
+``i+1``; the flag defaults to ``0``, which is correct only for an axis with no
+embedding row. Omitting it projects onto the wrong axis row at every layer while
+still writing a table the layer guard accepts, because the guard checks the
+``layer`` column's numbering, not which axis row the direction came from.
 
 The generated region of a step is the whole assistant block, reasoning and
 tool-call render included, not just the final token. The run checkpoints per
@@ -165,7 +176,10 @@ numbers at the wrong depth.
 
 Each script reads the projection tables from stage 3 and writes one JSON or CSV under
 `data/`, and carries the exact command in its docstring. All are CPU-only, and all run
-on their defaults with no arguments once stage 3 has produced its outputs.
+on their defaults with no arguments once stage 3 has produced its outputs -- except
+`logit_lens_replication.py`, which additionally needs `--shard` pointing at the model
+`.safetensors` shard that holds `lm_head.weight`, since that lives in your Hugging Face
+cache rather than under `data/`.
 
 Two of them write CSVs that others consume, so run these first:
 

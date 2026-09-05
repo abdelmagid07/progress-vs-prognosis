@@ -162,10 +162,17 @@ def main() -> None:
         sweep = rows
         raw = np.array([r["raw"] for r in rows])
         res = np.array([r["residualised"] for r in rows])
+        # Threshold derived from the pair count, not hardcoded: the number of pairs a sign
+        # test needs for p<0.05 scales with n, so a fixed constant silently becomes the
+        # wrong bar (and can fall below chance) whenever the pair set changes size.
+        n_sweep = int(meta_all["task_id"].nunique())
+        need = next((k for k in range(n_sweep // 2, n_sweep + 1)
+                     if binomtest(k, n_sweep, 0.5).pvalue < 0.05), n_sweep)
         print(f"\nlayer sweep (C={args.C}, all steps): "
               f"raw median {np.median(raw):.0f}, residualised median {np.median(res):.0f}; "
-              f"layers >=14 correct: raw {int((raw >= 14).sum())}/64, "
-              f"residualised {int((res >= 14).sum())}/64")
+              f"layers >={need} correct (sign-test p<0.05 at n={n_sweep} pairs): "
+              f"raw {int((raw >= need).sum())}/64, "
+              f"residualised {int((res >= need).sum())}/64")
 
     out = {
         "axis_layer": args.layer,

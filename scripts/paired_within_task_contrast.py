@@ -144,9 +144,11 @@ def main() -> None:
                     default=ROOT / "data" / "projections_pairs50.parquet")
     ap.add_argument("--readout", choices=sorted(READOUTS), default="final")
     ap.add_argument("--layer", type=int, default=53,
-                    help="Layer to report as the headline. Default: the layer with the "
-                         "smallest Wilcoxon p across the sweep, which is POST-HOC and "
-                         "labelled as such in the output.")
+                    help="Axis-row layer to report as the headline (default: 53, the "
+                         "pre-specified primary layer; labelled 'pre-specified' in the "
+                         "output). Pass no value only via the API: setting this to None "
+                         "selects the smallest-Wilcoxon-p layer instead, which is POST-HOC "
+                         "and is labelled as such in the output.")
     ap.add_argument("--out-prefix", default="paired_within_task")
     args = ap.parse_args()
 

@@ -184,7 +184,8 @@ def main() -> None:
 
     s = out["stability_disjoint_halves"]
     a = out["alignment_with_value_axis"]
-    print(f"\n1. STABILITY (disjoint 9+9 halves, {args.n_splits} splits)")
+    n_a = len(tasks) // 2
+    print(f"\n1. STABILITY (disjoint {n_a}+{len(tasks) - n_a} halves, {args.n_splits} splits)")
     print(f"   cosine between half-directions: mean {s['cosine_mean']:+.3f} "
           f"(range {s['cosine_min']:+.3f}..{s['cosine_max']:+.3f})")
     print(f"   null (random pairs of directions): mean |cos| {s['null_cosine_mean_abs']:.4f}, "
